@@ -45,15 +45,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .cors(withDefaults()) // Ahora usa la configuración global de CORS
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/cerro-verde/generar-token", "/cerro-verde/usuarios/").permitAll()
-                        .anyRequest().authenticated())
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+            .csrf(csrf -> csrf.disable())
+            .cors(withDefaults())
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().permitAll()) // <-- Todo es público
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    
+            http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
+            return http.build();
+        }
 }
