@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -23,9 +24,11 @@ public class TransaccionesCaja {
     private Date fechaHoraTransaccion;
     
     @ManyToOne
+    @JoinColumn(name = "id_caja")
     private Cajas caja;
 
     @ManyToOne
+    @JoinColumn(name = "id_tipo_transacciones")
     private TipoTransacciones tipo;
 
     private Integer estado = 1;

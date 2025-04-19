@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -20,6 +21,7 @@ public class ArqueosCaja {
     private String observaciones;
 
     @OneToOne
+    @JoinColumn(name = "id_caja")
     private Cajas caja;
 
     public Integer getId() {
