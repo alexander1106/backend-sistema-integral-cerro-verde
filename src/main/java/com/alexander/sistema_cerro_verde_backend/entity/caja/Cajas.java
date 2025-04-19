@@ -22,7 +22,7 @@ public class Cajas {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_caja")
     private Integer id;
-
+    
     private Double montoApertura;
     private Double montoCierre;
     private Date fechaApertura;
