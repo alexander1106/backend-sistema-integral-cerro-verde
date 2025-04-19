@@ -1,4 +1,4 @@
-package com.alexander.sistema_cerro_verde_backend.service.jpa.caja;
+package com.alexander.sistema_cerro_verde_backend.service.caja.jpa;
 
 import java.util.List;
 import java.util.Optional;
