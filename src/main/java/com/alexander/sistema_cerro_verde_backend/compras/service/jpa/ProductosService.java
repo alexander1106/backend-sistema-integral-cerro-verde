@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.alexander.sistema_cerro_verde_backend.compras.entity.Productos;
 import com.alexander.sistema_cerro_verde_backend.compras.repository.ProductosRepository;
 import com.alexander.sistema_cerro_verde_backend.compras.service.IProductosService;
@@ -13,6 +14,8 @@ import com.alexander.sistema_cerro_verde_backend.compras.service.IProductosServi
 public class ProductosService implements IProductosService{
     @Autowired
     private ProductosRepository repoProductos;
+
+    @Override
     public List<Productos> buscarTodos(){
         return repoProductos.findAll();
     }

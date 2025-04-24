@@ -6,7 +6,9 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,8 +34,8 @@ public class Compras {
     @ManyToOne
     @JoinColumn(name = "ruc_proveedor")
     private Proveedores proveedor;
-    @OneToMany(mappedBy = "compra")
-    @JsonIgnore
+    @OneToMany(mappedBy = "compra", cascade=CascadeType.ALL)
+    @JsonManagedReference
     private List<DetallesCompra> detallecompra;
     @OneToMany(mappedBy = "compra")
     @JsonIgnore

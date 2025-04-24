@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,6 +33,7 @@ public class DetallesCompra {
     private Integer estado = 1;
     @ManyToOne
     @JoinColumn(name = "id_compra")
+    @JsonBackReference
     private Compras compra;
     @ManyToOne
     @JoinColumn(name = "id_producto")
@@ -100,8 +103,8 @@ public class DetallesCompra {
             ", precio='" + getPrecio() + "'" +
             ", subtotal='" + getSubtotal() + "'" +
             ", estado='" + getEstado() + "'" +
-            ", compra='" + getCompra() + "'" +
-            ", producto='" + getProducto() + "'" +
+            ", producto=" + (producto != null ? producto.getId_producto() : "null") +
+            ", compra_id=" + (compra != null ? compra.getId_compra() : "null") +
             "}";
     }
 }
