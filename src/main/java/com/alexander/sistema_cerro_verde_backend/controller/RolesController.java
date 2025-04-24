@@ -2,7 +2,6 @@ package com.alexander.sistema_cerro_verde_backend.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alexander.sistema_cerro_verde_backend.entity.Roles;
-import com.alexander.sistema_cerro_verde_backend.entity.RolesPermisos;
 import com.alexander.sistema_cerro_verde_backend.service.IRolesService;
 
 @RestController
@@ -26,12 +24,12 @@ public class RolesController {
     @Autowired
     private IRolesService rolesService;
 
-    @GetMapping("/")
-  public List<Roles> obtenerTodosLosPermisos() {
+    @GetMapping("/roles/")
+    public List<Roles> obtenerTodosLosPermisos() {
         return rolesService.obtenerTodosLosRoles();
     }
 
-    @PutMapping("/")
+    @PutMapping("/roles/")
     public ResponseEntity<Roles> actualizarPregunta(@RequestBody Roles rol){
         return ResponseEntity.ok(rolesService.actualizarRol(rol));
     }
@@ -47,20 +45,7 @@ public class RolesController {
 
     @PostMapping("/roles/")
     public ResponseEntity<Roles> crearRol(@RequestBody Roles rol) {
-        try {
-            System.out.println("DEBUG: Rol recibido: " + rol.getNombreRol());
-            System.out.println("DEBUG: Permisos recibidos:");
-            for (RolesPermisos rp : rol.getRolesPermisos()) {
-                if (rp.getPermisos() != null) {
-                    System.out.println(" -> Permiso ID: " + rp.getPermisos().getIdPermisos());
-                }
-            }
-            Roles nuevoRol = rolesService.crearRol(rol);
-            return new ResponseEntity<>(nuevoRol, HttpStatus.CREATED);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        return ResponseEntity.ok(rolesService.crearRol(rol));
     }
     
    

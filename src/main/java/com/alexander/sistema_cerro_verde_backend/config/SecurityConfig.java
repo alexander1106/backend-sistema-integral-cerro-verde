@@ -42,18 +42,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(); // Crea una instancia del codificador BCrypt
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .cors(withDefaults())
-            .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()) // <-- Todo es público
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-    
-            http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-            return http.build();
-        }
 }

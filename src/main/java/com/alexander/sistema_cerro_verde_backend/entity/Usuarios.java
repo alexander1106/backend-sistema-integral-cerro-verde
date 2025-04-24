@@ -6,6 +6,7 @@ import java.util.HashSet;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -20,13 +21,16 @@ import jakarta.persistence.Table;
 public class Usuarios implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id_usuario")
     private Integer idUsuarios;
-    private String username; 
+    private String username;
+    @Column(name="contrasena")
     private String password;
     private String nombre;
     private String apellidos;
     private String email;
     private String telefono;
+    @Column(name="estado")
     private boolean enable = true; 
     private String perfil;
 

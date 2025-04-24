@@ -1,6 +1,7 @@
 package com.alexander.sistema_cerro_verde_backend.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -11,20 +12,21 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "rolespermisos")
+@Table(name = "roles_x_permisos")
 public class RolesPermisos {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id_rol_permiso")
     private Integer rolesPermisosId;
 
-    @ManyToOne(fetch= FetchType.EAGER)
-    @JoinColumn(name = "rol_id")
-    @JsonBackReference
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_rol")
+    @JsonBackReference // Bien aplicado
     private Roles roles;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "permiso_id")
+    @JoinColumn(name = "id_permio")
     private Permisos permisos;
 
     public RolesPermisos() {}  // Constructor vacío
@@ -38,11 +40,11 @@ public class RolesPermisos {
         this.rolesPermisosId = rolesPermisosId;
     }
 
-    public Roles getRol() {
+    public Roles getRoles() {
         return roles;
     }
 
-    public void setRol(Roles rol) {
+    public void setRoles(Roles rol) {
         this.roles = rol;
     }
 

@@ -5,17 +5,17 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alexander.sistema_cerro_verde_backend.entity.Modulos;
 import com.alexander.sistema_cerro_verde_backend.entity.Permisos;
-import com.alexander.sistema_cerro_verde_backend.repository.ModuloRepository;
+import com.alexander.sistema_cerro_verde_backend.entity.Submodulo;
 import com.alexander.sistema_cerro_verde_backend.repository.PermisosRepository;
+import com.alexander.sistema_cerro_verde_backend.repository.SubModuloRepository;
 import com.alexander.sistema_cerro_verde_backend.service.IPermisosService;
 
 @Service
 public class PermisosService implements IPermisosService{
 
     @Autowired
-    private ModuloRepository moduloRepository;
+    private SubModuloRepository subModuloRepository;
 
     @Autowired
     private PermisosRepository permisosRepository;
@@ -28,6 +28,7 @@ public class PermisosService implements IPermisosService{
     @Override
     public Permisos editarPermiso(Permisos permisos) {
         return permisosRepository.save(permisos);
+        
     }
 
     @Override
@@ -37,25 +38,25 @@ public class PermisosService implements IPermisosService{
 
     @Override
     public Permisos crearPermiso(Permisos permiso) {
-        Integer idModulo = permiso.getModulo().getIdModulo();
-        Modulos modulo = moduloRepository.findById(idModulo).orElse(null);
+        Integer idModulo = permiso.getSubModulo().getIdSubModulo();
+        Submodulo modulo = subModuloRepository.findById(idModulo).orElse(null);
         if (modulo != null) {
-            permiso.setModulo(modulo);  // Asocia el Modulo completo
+            permiso.setSubModulo(modulo);// Asocia el Modulo completo
             return permisosRepository.save(permiso);
         } else {
-            throw new RuntimeException("Modulo no encontrado");
+            throw new RuntimeException("Sub modulo no encontrado");
         }
     }
 
     @Override
     public void eliminarPermiso(Integer idPermiso) {
         Permisos permisos = new Permisos();
-        permisos.setIdPermisos(idPermiso);
+        permisos.setIdPermiso(idPermiso);
         permisosRepository.delete(permisos);
     }
 
     @Override
     public List<Permisos> obtenerPermisosPorModulo(Integer idModulo) {
-        return permisosRepository.findByModulo_IdModulo(idModulo);
+        return permisosRepository.findBySubModulo_Modulo_IdModulo(idModulo);
     }
 }

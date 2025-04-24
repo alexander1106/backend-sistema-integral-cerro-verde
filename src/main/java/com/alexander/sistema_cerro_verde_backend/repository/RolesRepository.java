@@ -9,5 +9,4 @@ import com.alexander.sistema_cerro_verde_backend.entity.Roles;
 @Repository
 public interface RolesRepository extends JpaRepository<Roles, Integer> {
     Optional<Roles> findByNombreRol(String nombreRol);
-
 }

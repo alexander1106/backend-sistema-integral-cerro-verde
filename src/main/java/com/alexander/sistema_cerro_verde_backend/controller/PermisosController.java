@@ -41,7 +41,7 @@ public class PermisosController {
 
     @PutMapping("/permisos/{id}")
     public ResponseEntity<Permisos> actualizarModulo(@PathVariable Integer id, @RequestBody Permisos permisos) {
-        permisos.setIdPermisos(id); // Asegúrate que el ID del path coincida con el del objeto
+        permisos.setIdPermiso(id); // Asegúrate que el ID del path coincida con el del objeto
         Permisos actualizado = permisosService.editarPermiso(permisos);
         return ResponseEntity.ok(actualizado);
     }  

@@ -16,38 +16,38 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alexander.sistema_cerro_verde_backend.entity.Modulos;
 import com.alexander.sistema_cerro_verde_backend.service.IModulosService;
 
-@RestController
-@RequestMapping("/cerro-verde")
-@CrossOrigin("*") 
-public class ModuloController {
+    @RestController
+    @RequestMapping("/cerro-verde")
+    @CrossOrigin("*") 
+    public class ModuloController {
 
-    @Autowired
-    private IModulosService moduloService;
+        @Autowired
+        private IModulosService moduloService;
 
-    @PostMapping("/modulos/")
-    public Modulos guardarModulo(@RequestBody Modulos modulo) throws Exception{
-        return moduloService.crearModulo(modulo);
-    }
-   
-    @PutMapping("/modulos/{id}")
-    public ResponseEntity<Modulos> actualizarModulo(@PathVariable Integer id, @RequestBody Modulos modulo) {
-        modulo.setIdModulo(id); 
-        Modulos actualizado = moduloService.editarModulo(modulo);
-        return ResponseEntity.ok(actualizado);
-    }  
-
-    @GetMapping("/modulos/")
-    public List<Modulos> listarUsuarios(){
-        return moduloService.obtenerTodosLooModulos();
-    }
+        @PostMapping("/modulos/")
+        public Modulos guardarModulo(@RequestBody Modulos modulo) throws Exception{
+            return moduloService.crearModulo(modulo);
+        }
     
-    @GetMapping("/modulos/{idModulo}")
-    public Modulos obtenerModulo(@PathVariable("idModulo") Integer idModulo) {
-        return moduloService.obtenerModuloId(idModulo);
-    }
+        @PutMapping("/modulos/{id}")
+        public ResponseEntity<Modulos> actualizarModulo(@PathVariable Integer id, @RequestBody Modulos modulo) {
+            modulo.setIdModulo(id); 
+            Modulos actualizado = moduloService.editarModulo(modulo);
+            return ResponseEntity.ok(actualizado);
+        }  
 
-    @DeleteMapping("/modulos/{id}")
-    public void eliminarPermiso(@PathVariable("id") Integer id) {
-        moduloService.eliminarModulo(id);
+        @GetMapping("/modulos/")
+        public List<Modulos> listarUsuarios(){
+            return moduloService.obtenerTodosLooModulos();
+        }
+        
+        @GetMapping("/modulos/{idModulo}")
+        public Modulos obtenerModulo(@PathVariable("idModulo") Integer idModulo) {
+            return moduloService.obtenerModuloId(idModulo);
+        }
+
+        @DeleteMapping("/modulos/{id}")
+        public void eliminarPermiso(@PathVariable("id") Integer id) {
+            moduloService.eliminarModulo(id);
+        }
     }
-}
