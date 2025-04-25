@@ -1,9 +1,12 @@
 package com.alexander.sistema_cerro_verde_backend.compras.controller;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,8 +45,8 @@ public class ComprasController {
         return serviceCompras.buscarId(id_compra);
     }
     @DeleteMapping("/compras/{id}")
-    public String eliminar(@PathVariable("id") Integer id_compra){
+    public ResponseEntity<Map<String, String>> eliminar(@PathVariable("id") Integer id_compra){
         serviceCompras.eliminar(id_compra);
-        return "Compra eliminada";
+        return ResponseEntity.ok(Collections.singletonMap("mensaje", "Categoria eliminado"));
     }
 }
