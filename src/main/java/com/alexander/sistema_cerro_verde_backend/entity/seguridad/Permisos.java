@@ -23,12 +23,15 @@ public class Permisos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id_permiso")
     private Integer id;
+    @Column(name="nombre")
     private String nombrePermiso;
+    private String descripcion;
     private boolean estado;
 
     @OneToMany(mappedBy = "permisos", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<RolesPermisos> rolesPermisos = new LinkedHashSet<>();
+    
      // Relación con Submodulos (clave foránea)
      @ManyToOne
      @JoinColumn(name = "id_sub_modulo", nullable = true)  // La relación con el submódulo es opcional
@@ -75,6 +78,14 @@ public class Permisos {
     }
     public void setUsuariosPermisos(List<UsuariosPermisos> usuariosPermisos) {
         this.usuariosPermisos = usuariosPermisos;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
     
     

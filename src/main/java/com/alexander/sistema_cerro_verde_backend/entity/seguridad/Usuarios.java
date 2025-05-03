@@ -30,11 +30,13 @@ public class Usuarios implements UserDetails {
     @Column(name="id_usuario")
     private Integer idUsuario;
     private String username;
+    @Column(name="contrasena")
     private String password;
     private String nombre;
     private String apellidos;
     private String email;
     private String telefono;
+    @Column(name="estado")
     private boolean enable = true; 
     private String perfil;
 

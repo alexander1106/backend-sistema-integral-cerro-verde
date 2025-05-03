@@ -29,6 +29,7 @@ public class Submodulo {
     @OneToMany(mappedBy = "subModulo")
     @JsonIgnore
     private Set<Permisos> permisos = new HashSet<>();
+    
     @ManyToOne // Relación de muchos a uno con Modulo
     @JoinColumn(name = "id_modulo")
     private Modulos modulo;  // El módulo al que pertenece este submódulo

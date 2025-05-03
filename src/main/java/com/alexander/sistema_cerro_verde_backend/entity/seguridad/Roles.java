@@ -24,9 +24,8 @@ public class Roles {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id_rol")
     private Integer id;
-    @Column(name="nombre_rol")
+    @Column(name="nombre")
     private String nombreRol;
-
     private String descripcion;
     private boolean estado;
     
