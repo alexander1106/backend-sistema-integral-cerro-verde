@@ -107,4 +107,5 @@ public class DetallesCompra {
             ", compra_id=" + (compra != null ? compra.getId_compra() : "null") +
             "}";
     }
+
 }

@@ -19,6 +19,7 @@ public class ComprasService implements IComprasService{
     @Autowired
     private ProductosRepository repoProductos;
 
+    @Override
     public List<Compras> buscarTodos(){
         return repoCompras.findAll();
     }

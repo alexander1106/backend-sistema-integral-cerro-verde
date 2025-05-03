@@ -26,8 +26,12 @@ public class Compras {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id_compra;
-    private String correlativo;
-    private String fecha_compra;    
+    private String numeroDoc;
+    private Double total;
+    private Double flete;
+    private Double descuento;
+    private String fecha_compra;  
+    private Double igv;  
     private Integer estado = 1;
     private Integer id_usuario;
     private Integer id_sucursal;
@@ -47,14 +51,6 @@ public class Compras {
 
     public void setId_compra(Integer id_compra) {
         this.id_compra = id_compra;
-    }
-
-    public String getCorrelativo() {
-        return this.correlativo;
-    }
-
-    public void setCorrelativo(String correlativo) {
-        this.correlativo = correlativo;
     }
 
     public String getFecha_compra() {
@@ -113,18 +109,43 @@ public class Compras {
         this.movimientoinventario = movimientoinventario;
     }
 
-    @Override
-    public String toString() {
-        return "{" +
-            " id_compra='" + getId_compra() + "'" +
-            ", correlativo='" + getCorrelativo() + "'" +
-            ", fecha_compra='" + getFecha_compra() + "'" +
-            ", estado='" + getEstado() + "'" +
-            ", id_usuario='" + getId_usuario() + "'" +
-            ", id_sucursal='" + getId_sucursal() + "'" +
-            ", proveedor='" + getProveedor() + "'" +
-            ", detallecompra='" + getDetallecompra() + "'" +
-            ", movimientoinventario='" + getMovimientoinventario() + "'" +
-            "}";
+    public String getNumeroDoc() {
+        return numeroDoc;
+    }
+
+    public void setNumeroDoc(String numeroDoc) {
+        this.numeroDoc = numeroDoc;
+    }
+
+    public Double getTotal() {
+        return total;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
+    }
+
+    public Double getFlete() {
+        return flete;
+    }
+
+    public void setFlete(Double flete) {
+        this.flete = flete;
+    }
+
+    public Double getDescuento() {
+        return descuento;
+    }
+
+    public void setDescuento(Double descuento) {
+        this.descuento = descuento;
+    }
+
+    public Double getIgv() {
+        return igv;
+    }
+
+    public void setIgv(Double igv) {
+        this.igv = igv;
     }
 }

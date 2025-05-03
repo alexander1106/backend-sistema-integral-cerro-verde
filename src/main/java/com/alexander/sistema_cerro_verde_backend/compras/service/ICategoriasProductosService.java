@@ -6,13 +6,16 @@ import java.util.Optional;
 import com.alexander.sistema_cerro_verde_backend.compras.entity.CategoriasProductos;
 
 public interface ICategoriasProductosService {
-    List<CategoriasProductos> buscarTodos();
-    //Método para listar todos los registros 
-    void guardar(CategoriasProductos categoriaProducto);
 
-    void modificar(CategoriasProductos categoriaProducto);
+    List<CategoriasProductos> buscarTodos(); //Listar categorias
 
-    Optional<CategoriasProductos> buscarId(Integer id_categoria);
+    List<CategoriasProductos> buscarActivos(); //Listar categorias activos
 
-    void eliminar(Integer id_categoria);
+    void guardar(CategoriasProductos categoriaProducto); //Guardar categoria
+
+    void modificar(CategoriasProductos categoriaProducto); //Modificar categoria
+
+    Optional<CategoriasProductos> buscarId(Integer id_categoria); //Buscar por Id categoria
+
+    void eliminar(Integer id_categoria); //Eliminar categoria, estado = 0
 }

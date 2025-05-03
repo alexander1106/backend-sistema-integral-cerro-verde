@@ -36,6 +36,8 @@ public class Productos {
     @OneToMany(mappedBy = "producto")
     @JsonIgnore
     private List<MovimientosInventario> movimientoinventario;
+    @OneToMany(mappedBy="producto")
+    private List<UnidadMedida> unidadMedida;
 
     public Integer getId_producto() {
         return this.id_producto;
@@ -104,5 +106,13 @@ public class Productos {
             ", detallecompra='" + getDetallecompra() + "'" +
             ", movimientoinventario='" + getMovimientoinventario() + "'" +
             "}";
+    }
+
+    public List<UnidadMedida> getUnidadMedida() {
+        return unidadMedida;
+    }
+
+    public void setUnidadMedida(List<UnidadMedida> unidadMedida) {
+        this.unidadMedida = unidadMedida;
     }
 }

@@ -6,13 +6,16 @@ import java.util.Optional;
 import com.alexander.sistema_cerro_verde_backend.compras.entity.Proveedores;
 
 public interface IProveedoresService {
-    List<Proveedores> buscarTodos();
-    //Método para listar todos los registros 
-    void guardar(Proveedores proveedor);
 
-    void modificar(Proveedores proveedor);
+    List<Proveedores> buscarTodos(); //Listar proveedores
 
-    Optional<Proveedores> buscarId(String ruc_proveedor);
+    List<Proveedores> buscarActivos(); //Listar proveedores activos
 
-    void eliminar(String ruc_proveedor);
+    void guardar(Proveedores proveedor); //Guardar proveedores
+
+    void modificar(Proveedores proveedor); //Modificar proveedores
+
+    Optional<Proveedores> buscarId(String ruc_proveedor); //Buscar proveedor por Ruc y estado = 1
+
+    void eliminar(String ruc_proveedor); //Eliminar proveedor, pasa a estado = 0
 }

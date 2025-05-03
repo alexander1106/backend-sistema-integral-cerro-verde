@@ -1,6 +1,7 @@
 package com.alexander.sistema_cerro_verde_backend.compras.controller;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,18 +19,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alexander.sistema_cerro_verde_backend.compras.entity.Proveedores;
-import com.alexander.sistema_cerro_verde_backend.compras.service.IProveedoresService;
+import com.alexander.sistema_cerro_verde_backend.compras.service.ApiService;
+import com.alexander.sistema_cerro_verde_backend.compras.service.jpa.ProveedoresService;
+
+
 
 @RestController
 @RequestMapping("/api")
 @CrossOrigin("*")
 public class ProveedoresController {
+
     @Autowired
-    private IProveedoresService serviceProveedores;
+    private ProveedoresService serviceProveedores;
+    @Autowired
+    private ApiService api;
+
     @GetMapping("/proveedores")
-    public List<Proveedores> buscarTodos() {
-        return serviceProveedores.buscarTodos(); //findAll
+    public List<Proveedores> buscarTodos() { //Listar todos los proveedores
+        return serviceProveedores.buscarTodos(); 
     }
+
+    @GetMapping("/proveedoresActivos")
+    public List<Proveedores> buscarActivos() {
+        return serviceProveedores.buscarActivos();
+    }
+
     @PostMapping("/proveedores")
     public Proveedores guardar(@RequestBody Proveedores proveedor) {
         serviceProveedores.guardar(proveedor);
@@ -49,4 +63,11 @@ public class ProveedoresController {
         serviceProveedores.eliminar(ruc_proveedor);
         return ResponseEntity.ok(Collections.singletonMap("mensaje", "Proveedor eliminado"));
     }
+    @GetMapping("/ruc/{id}")
+    public ResponseEntity<Map<String, String>> buscarRuc(@PathVariable("id") String ruc) {
+        String resultado = api.consumirApi(ruc);
+        Map<String, String> respuesta = new HashMap<>();
+        respuesta.put("datos", resultado);
+        return ResponseEntity.ok(respuesta);
+    } 
 }

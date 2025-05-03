@@ -18,32 +18,44 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alexander.sistema_cerro_verde_backend.compras.entity.CategoriasProductos;
-import com.alexander.sistema_cerro_verde_backend.compras.service.ICategoriasProductosService;
+import com.alexander.sistema_cerro_verde_backend.compras.service.jpa.CategoriasProductosService;
+
 
 @RestController
 @RequestMapping("/api")
 @CrossOrigin("*")
 public class CategoriasProductosController {
+
     @Autowired
-    private ICategoriasProductosService serviceCategoriasProductos;
+    private CategoriasProductosService serviceCategoriasProductos;
+
     @GetMapping("/categoriasproductos")
     public List<CategoriasProductos> buscarTodos(){
         return serviceCategoriasProductos.buscarTodos(); //findAll
     }
+
+    @GetMapping("/categoriasproductosactivos")
+    public List<CategoriasProductos> buscarActivos() {
+        return serviceCategoriasProductos.buscarActivos();
+    }
+
     @PostMapping("/categoriasproductos")
     public CategoriasProductos guardar (@RequestBody CategoriasProductos categoriaproducto){
         serviceCategoriasProductos.guardar(categoriaproducto);
         return categoriaproducto;
     }
+
     @PutMapping("/categoriasproductos")
     public CategoriasProductos modificar(@RequestBody CategoriasProductos categoriaproducto) {
         serviceCategoriasProductos.modificar(categoriaproducto);
         return categoriaproducto;
     }
+
     @GetMapping("/categoriasproductos/{id}")
     public Optional<CategoriasProductos> buscarId(@PathVariable("id") Integer id_categoria) {
         return serviceCategoriasProductos.buscarId(id_categoria);
     }
+
     @DeleteMapping("/categoriasproductos/{id}")
     public ResponseEntity<Map<String, String>> eliminar(@PathVariable("id") Integer id_categoria){
         serviceCategoriasProductos.eliminar(id_categoria);

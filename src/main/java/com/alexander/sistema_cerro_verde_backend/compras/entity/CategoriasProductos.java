@@ -3,7 +3,6 @@ package com.alexander.sistema_cerro_verde_backend.compras.entity;
 import java.util.List;
 
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -17,7 +16,6 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "categorias_prod")
 @SQLDelete(sql = "UPDATE categorias_prod SET estado = 0 WHERE id_categoria=?")
-@Where(clause = "estado = 1")
 public class CategoriasProductos {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
