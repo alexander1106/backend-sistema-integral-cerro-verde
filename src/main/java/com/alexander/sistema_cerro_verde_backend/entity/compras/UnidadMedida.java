@@ -1,7 +1,6 @@
 package com.alexander.sistema_cerro_verde_backend.entity.compras;
 
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +13,6 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "unidad_medida")
 @SQLDelete(sql = "UPDATE unidad_medida SET estado = 0 WHERE id_unidad=?")
-@Where(clause = "estado = 1")
 public class UnidadMedida {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)

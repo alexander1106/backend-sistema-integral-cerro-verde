@@ -44,7 +44,7 @@ public class ProveedoresService implements IProveedoresService {
                 prov.setDireccion(proveedor.getDireccion());
                 entityManager.merge(prov);
             } else {
-                throw new RuntimeException("El RUC ya está registrado y activo");
+                repoProveedores.save(proveedor);
             }
         } else {
             proveedor.setEstado(1);

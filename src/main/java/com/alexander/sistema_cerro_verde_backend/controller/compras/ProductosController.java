@@ -26,24 +26,34 @@ import com.alexander.sistema_cerro_verde_backend.service.compras.IProductosServi
 public class ProductosController {
     @Autowired
     private IProductosService serviceProductos;
+
     @GetMapping("/productos")
     public List<Productos> buscarTodos(){
-        return serviceProductos.buscarTodos(); //findAll
+        return serviceProductos.buscarTodos();
     }
+
+    @GetMapping("/productosactivos")
+    public List<Productos> buscarActivos(){
+        return serviceProductos.buscarActivos();
+    }
+
     @PostMapping("/productos")
     public Productos guardar(@RequestBody Productos producto) {
         serviceProductos.guardar(producto);
         return producto;
     }
+
     @PutMapping("/productos")
     public Productos modificar(@RequestBody Productos producto) {
         serviceProductos.modificar(producto);
         return producto;
     }
+
     @GetMapping("/productos/{id}")
     public Optional<Productos> buscarId(@PathVariable("id") Integer id_producto) {
         return serviceProductos.buscarId(id_producto);
     }
+
     @DeleteMapping("/productos/{id}")
     public ResponseEntity<Map<String, String>> eliminar(@PathVariable("id") Integer id_producto){
         serviceProductos.eliminar(id_producto);

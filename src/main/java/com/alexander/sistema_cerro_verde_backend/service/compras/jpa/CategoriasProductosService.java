@@ -35,7 +35,7 @@ public class CategoriasProductosService implements ICategoriasProductosService{
     @Override
     @Transactional
     public void guardar (CategoriasProductos categoriaproducto){ //Guardar categoria
-        Optional<CategoriasProductos> existente = repoCategoriasProductos.findByIdIncludingInactives(categoriaproducto.getId_categoria());
+        Optional<CategoriasProductos> existente = repoCategoriasProductos.findByNombreIgnoreCase(categoriaproducto.getNombre());
         if(existente.isPresent()){
             CategoriasProductos cp = existente.get();
             if(cp.getEstado() == 0){
