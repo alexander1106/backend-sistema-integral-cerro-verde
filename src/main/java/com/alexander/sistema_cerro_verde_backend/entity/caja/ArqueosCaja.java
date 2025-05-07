@@ -27,7 +27,7 @@ public class ArqueosCaja {
     @JoinColumn(name = "id_caja")
     private Cajas caja;
 
-    @OneToMany
+    @OneToMany(mappedBy = "arqueo")
     private List<DetalleArqueo> detalles;
 
     public Integer getId() {
