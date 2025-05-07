@@ -1,7 +1,21 @@
 package com.alexander.sistema_cerro_verde_backend.entity.ventas;
 
+import com.alexander.sistema_cerro_verde_backend.entity.reservas.Clientes;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="ventas")
 public class Ventas {
-    private Integer idVentas;
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private Integer idVenta;
     private String fecha;
     private Double total;
     private Double descuento;
@@ -10,16 +24,12 @@ public class Ventas {
     //Relación de muchos a uno con Usuario
 
     //Relación de muchos a uno con Cliente
+    @ManyToOne
+    @JoinColumn(name="id_cliente")
+    private Clientes cliente;
 
     //Relación de Uno a Muchos con MovimientosInventario
 
-    public Integer getIdVentas() {
-        return idVentas;
-    }
-
-    public void setIdVentas(Integer idVentas) {
-        this.idVentas = idVentas;
-    }
 
     public String getFecha() {
         return fecha;
@@ -51,5 +61,21 @@ public class Ventas {
 
     public void setCargo(Double cargo) {
         this.cargo = cargo;
+    }
+
+    public Clientes getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Clientes cliente) {
+        this.cliente = cliente;
+    }
+
+    public Integer getIdVenta() {
+        return idVenta;
+    }
+
+    public void setIdVenta(Integer idVenta) {
+        this.idVenta = idVenta;
     }
 }

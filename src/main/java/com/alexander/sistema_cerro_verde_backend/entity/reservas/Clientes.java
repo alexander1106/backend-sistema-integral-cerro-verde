@@ -1,13 +1,24 @@
 package com.alexander.sistema_cerro_verde_backend.entity.reservas;
 
+import java.util.List;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
+import com.alexander.sistema_cerro_verde_backend.entity.ventas.Ventas;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name="clientes")
+@SQLDelete(sql="UPDATE Clientes SET estado = 0 WHERE id_cliente=?")
+@SQLRestriction("estado = 1")
 public class Clientes {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -22,6 +33,9 @@ public class Clientes {
     //Relación de Uno a Muchos con Reserva
 
     //Relación de Uno a Muchos con Ventas
+    @OneToMany(mappedBy="cliente")
+    @JsonIgnore
+    private List<Ventas> venta;
 
     public Integer getIdCliente() {
         return idCliente;
@@ -77,5 +91,13 @@ public class Clientes {
 
     public void setEstado(Integer estado) {
         this.estado = estado;
+    }
+
+    public List<Ventas> getVenta() {
+        return venta;
+    }
+
+    public void setVenta(List<Ventas> venta) {
+        this.venta = venta;
     }
 }

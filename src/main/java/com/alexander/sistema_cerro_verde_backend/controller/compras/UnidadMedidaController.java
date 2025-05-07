@@ -27,24 +27,34 @@ import com.alexander.sistema_cerro_verde_backend.service.compras.jpa.UnidadMedid
 public class UnidadMedidaController {
 @Autowired
     private UnidadMedidaService serviceUnidad;
+
     @GetMapping("/unidadmedida")
     public List<UnidadMedida> buscarTodos() {
         return serviceUnidad.buscarTodos(); //findAll
     }
+
+    @GetMapping("/unidadmedidaactivo")
+    public List<UnidadMedida> buscarActivos() {
+        return serviceUnidad.buscarActivos(); 
+    }
+
     @PostMapping("/unidadmedida")
     public UnidadMedida guardar(@RequestBody UnidadMedida unidad) {
         serviceUnidad.guardar(unidad);
         return unidad;
     }
+
     @PutMapping("/unidadmedida")
     public UnidadMedida modificar(@RequestBody UnidadMedida unidad) {
         serviceUnidad.modificar(unidad);
         return unidad;
     }
+
     @GetMapping("/unidadmedida/{id}")
     public Optional<UnidadMedida> buscarId(@PathVariable("id") Integer id_unidad) {
         return serviceUnidad.buscarId(id_unidad);
     }
+
     @DeleteMapping("/unidadmedida/{id}")
     public ResponseEntity<Map<String, String>> eliminar(@PathVariable("id") Integer id_unidad){
         serviceUnidad.eliminar(id_unidad);

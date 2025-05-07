@@ -6,13 +6,15 @@ import java.util.Optional;
 import com.alexander.sistema_cerro_verde_backend.entity.compras.UnidadMedida;
 
 public interface IUnidadMedidaService {
-    List<UnidadMedida> buscarTodos();
-    //Método para listar todos los registros 
-    void guardar(UnidadMedida unidad);
+    List<UnidadMedida> buscarTodos(); //Listar todas las unidades de medida
 
-    void modificar(UnidadMedida unidad);
+    List<UnidadMedida> buscarActivos(); //Listar las unidades de medidas activos, estado = 1
 
-    Optional<UnidadMedida> buscarId(Integer id);
+    void guardar(UnidadMedida unidad); //Guardar unidad de medida
 
-    void eliminar(Integer id);
+    void modificar(UnidadMedida unidad); //Modificar unidad de medida
+
+    Optional<UnidadMedida> buscarId(Integer id); //Buscar una unidad de medida por Id
+
+    void eliminar(Integer id); //Eliminar unidad de medida
 }

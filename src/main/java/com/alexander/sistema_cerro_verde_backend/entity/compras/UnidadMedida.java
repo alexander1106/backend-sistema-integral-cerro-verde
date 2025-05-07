@@ -1,13 +1,16 @@
 package com.alexander.sistema_cerro_verde_backend.entity.compras;
 
+import java.util.List;
+
 import org.hibernate.annotations.SQLDelete;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -19,11 +22,13 @@ public class UnidadMedida {
     private Integer idUnidad;
     private String nombre;
     private String abreviatura;
+    private Integer equivalencia;
     private Integer estado = 1;
 
-    @ManyToOne
-    @JoinColumn(name="id_producto")
-    private Productos producto;
+    //Relación de Uno a muchos con ProductosXUnidad
+    @OneToMany(mappedBy="unidad")
+    @JsonIgnore
+    List<Productos> producto;
 
     public Integer getIdUnidad() {
         return idUnidad;
@@ -57,11 +62,19 @@ public class UnidadMedida {
         this.estado = estado;
     }
 
-    public Productos getProducto() {
+    public Integer getEquivalencia() {
+        return equivalencia;
+    }
+
+    public void setEquivalencia(Integer equivalencia) {
+        this.equivalencia = equivalencia;
+    }
+
+    public List<Productos> getProducto() {
         return producto;
     }
 
-    public void setProducto(Productos producto) {
+    public void setProducto(List<Productos> producto) {
         this.producto = producto;
     }
 }

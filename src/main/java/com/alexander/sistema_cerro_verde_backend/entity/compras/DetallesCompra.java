@@ -3,7 +3,6 @@ package com.alexander.sistema_cerro_verde_backend.entity.compras;
 import java.math.BigDecimal;
 
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -20,7 +19,6 @@ import jakarta.persistence.UniqueConstraint;
 @Entity
 @Table(name = "detalles_compra", uniqueConstraints = @UniqueConstraint(columnNames = {"id_compra","id_producto"}))
 @SQLDelete(sql = "UPDATE detalles_compra SET estado = 0 WHERE id_detalle_compra=?")
-@Where(clause = "estado = 1")
 public class DetallesCompra {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -42,6 +42,8 @@ public class ProductosService implements IProductosService{
                 p.setEstado(1);
                 p.setNombre(producto.getNombre());
                 p.setDescripcion(producto.getDescripcion());
+                p.setCategoriaproducto(producto.getCategoriaproducto());
+                p.setUnidad(producto.getUnidad());
                 entityManager.merge(p);
             } else {
                 repoProductos.save(producto);

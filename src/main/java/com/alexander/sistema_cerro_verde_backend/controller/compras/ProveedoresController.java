@@ -22,8 +22,6 @@ import com.alexander.sistema_cerro_verde_backend.entity.compras.Proveedores;
 import com.alexander.sistema_cerro_verde_backend.service.compras.ApiService;
 import com.alexander.sistema_cerro_verde_backend.service.compras.jpa.ProveedoresService;
 
-
-
 @RestController
 @RequestMapping("/api")
 @CrossOrigin("*")

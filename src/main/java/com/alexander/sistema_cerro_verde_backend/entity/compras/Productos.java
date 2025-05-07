@@ -24,6 +24,8 @@ public class Productos {
     private Integer id_producto;
     private String nombre;
     private String descripcion;
+    private Integer stock;
+    private Double precioVenta;
     private Integer estado = 1;
     @ManyToOne
     @JoinColumn(name = "id_categoria")
@@ -34,8 +36,9 @@ public class Productos {
     @OneToMany(mappedBy = "producto")
     @JsonIgnore
     private List<MovimientosInventario> movimientoinventario;
-    @OneToMany(mappedBy="producto")
-    private List<UnidadMedida> unidadMedida;
+    @ManyToOne
+    @JoinColumn(name="id_unidad")
+    private UnidadMedida unidad;
 
     public Integer getId_producto() {
         return this.id_producto;
@@ -106,11 +109,27 @@ public class Productos {
             "}";
     }
 
-    public List<UnidadMedida> getUnidadMedida() {
-        return unidadMedida;
+    public Integer getStock() {
+        return stock;
     }
 
-    public void setUnidadMedida(List<UnidadMedida> unidadMedida) {
-        this.unidadMedida = unidadMedida;
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
+    public Double getPrecioVenta() {
+        return precioVenta;
+    }
+
+    public void setPrecioVenta(Double precioVenta) {
+        this.precioVenta = precioVenta;
+    }
+
+    public UnidadMedida getUnidad() {
+        return unidad;
+    }
+
+    public void setUnidad(UnidadMedida unidad) {
+        this.unidad = unidad;
     }
 }
