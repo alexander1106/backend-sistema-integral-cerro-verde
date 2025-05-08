@@ -3,6 +3,7 @@ package com.alexander.sistema_cerro_verde_backend.entity.compras;
 import java.util.List;
 
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -20,6 +21,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "compras")
 @SQLDelete(sql = "UPDATE compras SET estado = 0 WHERE id_compra=?")
+@SQLRestriction("estado = 1")
 public class Compras {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
