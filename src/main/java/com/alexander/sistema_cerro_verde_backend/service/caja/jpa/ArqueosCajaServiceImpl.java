@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alexander.sistema_cerro_verde_backend.entity.caja.ArqueosCaja;
+import com.alexander.sistema_cerro_verde_backend.entity.caja.Cajas;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.DetalleArqueo;
 import com.alexander.sistema_cerro_verde_backend.repository.caja.ArqueosCajaRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.caja.DetalleArqueoRepository;
@@ -55,4 +56,9 @@ public class ArqueosCajaServiceImpl implements ArqueosCajaService {
         repository.deleteById(id);
     }
 
+    @Override
+    public Optional<ArqueosCaja> buscarPorCaja(Cajas caja) {
+        return repository.findByCaja(caja);
+    }
+    
 }

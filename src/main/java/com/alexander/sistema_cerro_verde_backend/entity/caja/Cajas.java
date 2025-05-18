@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -34,9 +35,13 @@ public class Cajas {
     @Column(name = "estado_caja")
     private String estadoCaja;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "id_usuario")
     private Usuarios usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "id_usuario_cierre")
+    private Usuarios usuarioCierre;
 
     @ManyToOne
     @JoinColumn(name = "id_sucursal")
@@ -124,11 +129,20 @@ public class Cajas {
         this.saldo = saldo;
     }
 
+    public Usuarios getUsuarioCierre() {
+        return usuarioCierre;
+    }
+
+    public void setUsuarioCierre(Usuarios usuarioCierre) {
+        this.usuarioCierre = usuarioCierre;
+    }
+
     @Override
     public String toString() {
         return "Cajas [id=" + id + ", montoApertura=" + montoApertura + ", montoCierre=" + montoCierre + ", saldo="
                 + saldo + ", fechaApertura=" + fechaApertura + ", fechaCierre=" + fechaCierre + ", estadoCaja="
-                + estadoCaja + ", usuario=" + usuario + ", sucursal=" + sucursal + ", estado=" + estado + "]";
+                + estadoCaja + ", usuario=" + usuario + ", usuarioCierre=" + usuarioCierre + ", sucursal=" + sucursal
+                + ", estado=" + estado + "]";
     }
     
 }

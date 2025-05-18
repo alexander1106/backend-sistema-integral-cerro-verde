@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.alexander.sistema_cerro_verde_backend.entity.caja.Cajas;
+import com.alexander.sistema_cerro_verde_backend.entity.seguridad.Usuarios;
 
 public interface CajasService {
     
@@ -18,4 +19,9 @@ public interface CajasService {
     Cajas guardar(Cajas caja);
 
     void eliminarId(Integer id);
+
+    Optional<Cajas> buscarCajaAperturadaPorUsuario(Usuarios usuario);
+    
+    Optional<Cajas> buscarCajaPorUsuario(Usuarios usuario);
+
 }

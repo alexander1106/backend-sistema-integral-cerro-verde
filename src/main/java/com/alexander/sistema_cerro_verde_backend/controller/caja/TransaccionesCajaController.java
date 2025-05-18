@@ -85,5 +85,5 @@ public class TransaccionesCajaController {
 
     List<TransaccionesCaja> transacciones = transaccionesCajaService.buscarPorCaja(cajaActual.get());
     return ResponseEntity.ok(transacciones);
-}
+    }
 }

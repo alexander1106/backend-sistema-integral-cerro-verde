@@ -1,5 +1,7 @@
 package com.alexander.sistema_cerro_verde_backend.entity.caja;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +24,7 @@ public class DetalleArqueo {
     
     @ManyToOne
     @JoinColumn(name = "id_arqueo")
+    @JsonBackReference
     private ArqueosCaja arqueo;
     
     @ManyToOne
