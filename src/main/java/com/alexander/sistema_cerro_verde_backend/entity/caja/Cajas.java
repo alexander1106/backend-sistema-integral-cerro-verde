@@ -27,7 +27,8 @@ public class Cajas {
     private Double montoApertura;
     @Column(name = "monto_cierre")
     private Double montoCierre;
-    private Double saldo;
+    private Double saldoFisico;
+    private Double saldoTotal;
     @Column(name = "fecha_apertura")
     private Date fechaApertura;
     @Column(name = "fecha_cierre")
@@ -121,12 +122,20 @@ public class Cajas {
         this.estado = estado;
     }
 
-    public Double getSaldo() {
-        return saldo;
+    public Double getSaldoFisico() {
+        return saldoFisico;
     }
 
-    public void setSaldo(Double saldo) {
-        this.saldo = saldo;
+    public void setSaldoFisico(Double saldoFisico) {
+        this.saldoFisico = saldoFisico;
+    }
+
+    public Double getSaldoTotal() {
+        return saldoTotal;
+    }
+
+    public void setSaldoTotal(Double saldoTotal) {
+        this.saldoTotal = saldoTotal;
     }
 
     public Usuarios getUsuarioCierre() {
@@ -139,8 +148,9 @@ public class Cajas {
 
     @Override
     public String toString() {
-        return "Cajas [id=" + id + ", montoApertura=" + montoApertura + ", montoCierre=" + montoCierre + ", saldo="
-                + saldo + ", fechaApertura=" + fechaApertura + ", fechaCierre=" + fechaCierre + ", estadoCaja="
+        return "Cajas [id=" + id + ", montoApertura=" + montoApertura + ", montoCierre=" + montoCierre + ", saldoFisico="
+                + saldoFisico + ", saldoTotal="
+                + saldoTotal + ", fechaApertura=" + fechaApertura + ", fechaCierre=" + fechaCierre + ", estadoCaja="
                 + estadoCaja + ", usuario=" + usuario + ", usuarioCierre=" + usuarioCierre + ", sucursal=" + sucursal
                 + ", estado=" + estado + "]";
     }

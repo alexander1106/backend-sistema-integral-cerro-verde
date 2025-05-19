@@ -41,17 +41,17 @@ public class TransaccionesCajaController {
 
             Cajas caja = cajaAbierta.get();
 
-            if (transaccion.getTipo().getId() == 2 && transaccion.getMontoTransaccion() > caja.getSaldo()) {
+            if (transaccion.getTipo().getId() == 2 && transaccion.getMontoTransaccion() > caja.getSaldoFisico()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("El monto del egreso no puede ser mayor al saldo actual de la caja (" + caja.getSaldo() + ")");
+                    .body("El monto del egreso no puede ser mayor al saldo actual de la caja (" + caja.getSaldoFisico() + ")");
             }
 
             transaccion.setCaja(cajaAbierta.get());
             transaccion.setFechaHoraTransaccion(new Date());
             if (transaccion.getTipo().getId() == 1) {
-                caja.setSaldo(caja.getSaldo() + transaccion.getMontoTransaccion());
+                caja.setSaldoFisico(caja.getSaldoFisico() + transaccion.getMontoTransaccion());
             } else {
-                caja.setSaldo(caja.getSaldo() - transaccion.getMontoTransaccion());
+                caja.setSaldoFisico(caja.getSaldoFisico() - transaccion.getMontoTransaccion());
             }
 
             transaccionesCajaService.guardar(transaccion);

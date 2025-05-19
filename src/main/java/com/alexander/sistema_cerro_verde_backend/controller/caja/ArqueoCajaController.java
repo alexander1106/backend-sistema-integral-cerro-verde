@@ -1,6 +1,7 @@
 package com.alexander.sistema_cerro_verde_backend.controller.caja;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,6 +86,8 @@ public class ArqueoCajaController {
                 detalle.setArqueo(arqueo);
             }
         }
+
+        arqueo.setFechaArqueo(new Date());
     
         ArqueosCaja arqueoGuardado = arqueosCajaService.guardar(arqueo);
     

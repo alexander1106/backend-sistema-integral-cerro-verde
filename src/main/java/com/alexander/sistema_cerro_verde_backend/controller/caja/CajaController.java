@@ -57,48 +57,55 @@ public class CajaController {
     }
 
     @PostMapping("/aperturar")
-    public ResponseEntity<?> aperturarCaja(@RequestBody Cajas cajaRequest) {
+    public ResponseEntity<?> aperturarCaja() {
         Usuarios usuario = getUsuarioAutenticado();
         if (usuario == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
-        Optional<Cajas> cajaExistente = serviceCaja.buscarCajaPorUsuario(usuario);
-
-        if (cajaExistente.isPresent()) {
-            Cajas caja = cajaExistente.get();
-            caja.setEstadoCaja("abierta");
-            caja.setFechaApertura(new Date());
-            return ResponseEntity.ok(serviceCaja.guardar(caja));
+    
+        Optional<Cajas> cajaExistenteOpt = serviceCaja.buscarCajaPorUsuario(usuario);
+    
+        if (cajaExistenteOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existe caja asignada al usuario.");
         }
-
-        Cajas nuevaCaja = new Cajas();
-        nuevaCaja.setMontoApertura(cajaRequest.getMontoApertura());
-        nuevaCaja.setFechaApertura(new Date());
-        nuevaCaja.setEstadoCaja("abierta");
-        nuevaCaja.setUsuario(usuario);
-        nuevaCaja.setSaldo(cajaRequest.getMontoApertura());
-
-        return ResponseEntity.ok(serviceCaja.guardar(nuevaCaja));
+    
+        Cajas caja = cajaExistenteOpt.get();
+    
+        if ("abierta".equalsIgnoreCase(caja.getEstadoCaja())) {
+            return ResponseEntity.badRequest().body("La caja ya está aperturada.");
+        }
+    
+        // Asumimos que saldoFisico fue actualizado correctamente al cerrar
+        if (caja.getSaldoFisico() == null) {
+            return ResponseEntity.badRequest().body("No se puede aperturar porque el saldo físico anterior es nulo.");
+        }
+    
+        caja.setEstadoCaja("abierta");
+        caja.setFechaApertura(new Date());
+        caja.setMontoApertura(caja.getSaldoFisico());
+        caja.setSaldoFisico(caja.getSaldoFisico()); // reinicia el saldo con base al saldo físico
+    
+        return ResponseEntity.ok(serviceCaja.guardar(caja));
     }
+    
 
     @PostMapping("/cerrar")
     public ResponseEntity<?> cerrarCajaActual(@RequestBody Double montoCierre) {
         Usuarios usuario = getUsuarioAutenticado();
         Optional<Cajas> cajaAbierta = serviceCaja.buscarCajaAperturadaPorUsuario(usuario);
-
+    
         if (cajaAbierta.isEmpty()) {
             return ResponseEntity.badRequest().body("No hay una caja aperturada.");
         }
-
+    
         Cajas caja = cajaAbierta.get();
         caja.setMontoCierre(montoCierre);
+        caja.setSaldoFisico(montoCierre); // ⬅️ ESTO ES CLAVE
         caja.setFechaCierre(new Date());
         caja.setEstadoCaja("cerrada");
         caja.setUsuarioCierre(usuario);
-
+    
         return ResponseEntity.ok(serviceCaja.guardar(caja));
-    }
-
-    // Se eliminó el endpoint /historial global
+    }    
+    
 }

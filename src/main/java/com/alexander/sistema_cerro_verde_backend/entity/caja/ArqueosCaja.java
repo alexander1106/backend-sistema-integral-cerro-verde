@@ -1,5 +1,6 @@
 package com.alexander.sistema_cerro_verde_backend.entity.caja;
 
+import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -34,6 +35,11 @@ public class ArqueosCaja {
     @JsonManagedReference
     private List<DetalleArqueo> detalles;
 
+    @Column(name = "fecha_arqueo")
+    private Date fechaArqueo;
+
+    private Double totalArqueo;
+
     public Integer getId() {
         return id;
     }
@@ -66,11 +72,26 @@ public class ArqueosCaja {
         this.detalles = detalles;
     }
 
+    public Date getFechaArqueo() {
+        return fechaArqueo;
+    }
+
+    public void setFechaArqueo(Date fechaArqueo) {
+        this.fechaArqueo = fechaArqueo;
+    }
+
+    public Double getTotalArqueo() {
+        return totalArqueo;
+    }
+
+    public void setTotalArqueo(Double totalArqueo) {
+        this.totalArqueo = totalArqueo;
+    }
+
     @Override
     public String toString() {
         return "ArqueosCaja [id=" + id + ", observaciones=" + observaciones + ", caja=" + caja + ", detalles="
-                + detalles + "]";
+                + detalles + ", fechaArqueo=" + fechaArqueo + ", totalArqueo=" + totalArqueo + "]";
     }
-
     
 }
