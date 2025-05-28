@@ -1,6 +1,5 @@
 package com.alexander.sistema_cerro_verde_backend.controller.caja;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -8,6 +7,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,8 @@ import com.alexander.sistema_cerro_verde_backend.entity.caja.ArqueosCaja;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.Cajas;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.DenominacionDinero;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.DetalleArqueo;
+import com.alexander.sistema_cerro_verde_backend.entity.seguridad.Usuarios;
+import com.alexander.sistema_cerro_verde_backend.repository.seguridad.UsuariosRepository;
 import com.alexander.sistema_cerro_verde_backend.service.caja.ArqueosCajaService;
 import com.alexander.sistema_cerro_verde_backend.service.caja.CajasService;
 import com.alexander.sistema_cerro_verde_backend.service.caja.DenominacionDineroService;
@@ -41,6 +44,15 @@ public class ArqueoCajaController {
     @Autowired
     private DenominacionDineroService denominacionDineroService;
 
+    @Autowired
+    private UsuariosRepository usuarioRepository;
+
+    private Usuarios getUsuarioAutenticado() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        return usuarioRepository.findByUsername(username);
+    }
+
     @GetMapping("/denominaciones")
     public ResponseEntity<List<DenominacionDinero>> obtenerDenominaciones() {
         List<DenominacionDinero> denominaciones = denominacionDineroService.buscarTodos();
@@ -48,31 +60,23 @@ public class ArqueoCajaController {
     }
 
     @GetMapping
-    public ResponseEntity<?> verificarExistenciaArqueo() {
-            Optional<Cajas> cajaOpt = cajasService.buscarCajaAperturada();
+    public ResponseEntity<?> obtenerArqueosDeCajaActual() {
+        Usuarios usuario = getUsuarioAutenticado();
+        Optional<Cajas> cajaOpt = cajasService.buscarCajaPorUsuario(usuario);
 
         if (cajaOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hay caja aperturada.");
-        }
-        
-        else {
-            Optional<ArqueosCaja> arqueoExistencia = arqueosCajaService.buscarPorCaja(cajaOpt.get());
-
-            if (arqueoExistencia.isPresent()) {
-                return ResponseEntity.ok(arqueoExistencia.get());
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Collections.singletonMap("mensaje", "Arqueo no existe"));
-            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hay caja asociada al usuario.");
         }
 
+        List<ArqueosCaja> arqueos = arqueosCajaService.buscarTodosPorCaja(cajaOpt.get());
+        return ResponseEntity.ok(arqueos);
     }
     
     
     @PostMapping("/crear")
     public ResponseEntity<?> realizarArqueo(@RequestBody ArqueosCaja arqueo) {
-    
-        Optional<Cajas> cajaAperturadaOpt = cajasService.buscarCajaAperturada();
+        Usuarios usuario = getUsuarioAutenticado();
+        Optional<Cajas> cajaAperturadaOpt = cajasService.buscarCajaAperturadaPorUsuario(usuario);
         if (cajaAperturadaOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("No hay una caja aperturada actualmente.");
         }
@@ -84,8 +88,22 @@ public class ArqueoCajaController {
         if (arqueo.getDetalles() != null) {
             for (DetalleArqueo detalle : arqueo.getDetalles()) {
                 detalle.setArqueo(arqueo);
+
+                if (detalle.getDenominacion() != null && detalle.getDenominacion().getId() != null) {
+                    Optional<DenominacionDinero> denominacionOpt = denominacionDineroService.buscarId(detalle.getDenominacion().getId());
+                    DenominacionDinero denominacion = denominacionOpt.get();
+                    detalle.setDenominacion(denominacion);
+                }
             }
         }
+
+        double montoTotal = 0.0;
+
+        for (DetalleArqueo detalle : arqueo.getDetalles()) {
+            montoTotal += detalle.getCantidad() * detalle.getDenominacion().getValor();
+        }
+        
+        arqueo.setTotalArqueo(montoTotal);
 
         arqueo.setFechaArqueo(new Date());
     
@@ -135,14 +153,14 @@ public class ArqueoCajaController {
     }
 
     @GetMapping("/caja/{idCaja}")
-    public ResponseEntity<?> obtenerArqueoPorCaja(@PathVariable Integer idCaja) {
-    Optional<Cajas> caja = cajasService.buscarId(idCaja);
-    if (caja.isPresent()) {
-        Optional<ArqueosCaja> arqueo = arqueosCajaService.buscarPorCaja(caja.get());
-        return arqueo.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<List<ArqueosCaja>> obtenerArqueoPorCaja(@PathVariable Integer idCaja) {
+        Optional<Cajas> cajaOpt = cajasService.buscarId(idCaja);
+        if (cajaOpt.isPresent()) {
+            Cajas caja = cajaOpt.get();
+            return ResponseEntity.ok(arqueosCajaService.buscarTodosPorCaja(caja));
+        }
+        return ResponseEntity.notFound().build();
     }
-    return ResponseEntity.notFound().build();
-}
     
 }
     

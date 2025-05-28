@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alexander.sistema_cerro_verde_backend.entity.caja.Cajas;
+import com.alexander.sistema_cerro_verde_backend.entity.caja.TipoTransacciones;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.TransaccionesCaja;
 import com.alexander.sistema_cerro_verde_backend.repository.caja.CajasRepository;
+import com.alexander.sistema_cerro_verde_backend.repository.caja.TipoTransaccionesRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.caja.TransaccionesCajaRepository;
 import com.alexander.sistema_cerro_verde_backend.service.caja.TransaccionesCajaService;
 
@@ -18,6 +20,9 @@ public class TransaccionesCajaServiceImpl implements TransaccionesCajaService {
 
     @Autowired
     private TransaccionesCajaRepository repository;
+
+    @Autowired
+    private TipoTransaccionesRepository transaccionesRepository;
 
     @Autowired
     private CajasRepository cajaRepository;
@@ -56,6 +61,13 @@ public class TransaccionesCajaServiceImpl implements TransaccionesCajaService {
     @Transactional(readOnly = true)
     public List<TransaccionesCaja> buscarPorCaja(Cajas caja) {
         return repository.findByCaja(caja);
+    }
+
+    @Override
+    public TipoTransacciones obtenerTipoPorId(Integer id) {
+        Optional<TipoTransacciones> opt = transaccionesRepository.findById(id);
+        TipoTransacciones tipoTransaccion = opt.get();
+        return tipoTransaccion;
     }
 
 }

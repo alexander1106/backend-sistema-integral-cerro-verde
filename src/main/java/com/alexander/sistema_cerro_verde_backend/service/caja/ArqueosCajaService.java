@@ -18,4 +18,6 @@ public interface ArqueosCajaService {
 
     Optional<ArqueosCaja> buscarPorCaja(Cajas caja);
 
+    List<ArqueosCaja> buscarTodosPorCaja(Cajas caja);
+
 }

@@ -11,9 +11,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import com.alexander.sistema_cerro_verde_backend.entity.caja.Cajas;
+import com.alexander.sistema_cerro_verde_backend.entity.caja.TransaccionesCaja;
 import com.alexander.sistema_cerro_verde_backend.entity.seguridad.Usuarios;
 import com.alexander.sistema_cerro_verde_backend.repository.seguridad.UsuariosRepository;
 import com.alexander.sistema_cerro_verde_backend.service.caja.CajasService;
+import com.alexander.sistema_cerro_verde_backend.service.caja.TransaccionesCajaService;
 
 @CrossOrigin("*")
 @RestController
@@ -22,6 +24,9 @@ public class CajaController {
 
     @Autowired
     private CajasService serviceCaja;
+    
+    @Autowired
+    private TransaccionesCajaService transaccionesCajaService;
 
     @Autowired
     private UsuariosRepository usuarioRepository;
@@ -35,14 +40,31 @@ public class CajaController {
     @GetMapping
     public ResponseEntity<?> verificarEstadoCaja() {
         Usuarios usuario = getUsuarioAutenticado();
-        Optional<Cajas> cajaAbierta = serviceCaja.buscarCajaAperturadaPorUsuario(usuario);
-
-        if (cajaAbierta.isPresent()) {
-            return ResponseEntity.ok(cajaAbierta.get());
-        } else {
-            return ResponseEntity.ok("no_aperturada");
+    
+        Optional<Cajas> caja = serviceCaja.buscarCajaPorUsuario(usuario);
+        
+        // ✅ Si ya tiene caja, la retornamos
+        if (caja.isPresent()) {
+            return ResponseEntity.ok(caja.get());
         }
+    
+        // 🔍 Si no tiene caja y es CAJERO, se le crea una automáticamente
+        if (usuario.getRol().getNombreRol().equalsIgnoreCase("CAJERO") || usuario.getRol().getNombreRol().equalsIgnoreCase("ADMIN")) {
+            Cajas nuevaCaja = new Cajas();
+            nuevaCaja.setUsuario(usuario);
+            nuevaCaja.setEstadoCaja("cerrada");
+            nuevaCaja.setSaldoFisico(0.0);
+    
+            Cajas cajaGuardada = serviceCaja.guardar(nuevaCaja);
+    
+            return ResponseEntity.status(HttpStatus.CREATED).body(cajaGuardada);
+        }
+    
+        // ⚠️ Si no es CAJERO y no tiene caja
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("no existe ninguna caja para el usuario");
     }
+    
+    
 
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerCajaPorId(@PathVariable Integer id) {
@@ -57,7 +79,7 @@ public class CajaController {
     }
 
     @PostMapping("/aperturar")
-    public ResponseEntity<?> aperturarCaja() {
+    public ResponseEntity<?> aperturarCaja(@RequestBody(required = false) Cajas cajaRequest) {
         Usuarios usuario = getUsuarioAutenticado();
         if (usuario == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -65,28 +87,58 @@ public class CajaController {
     
         Optional<Cajas> cajaExistenteOpt = serviceCaja.buscarCajaPorUsuario(usuario);
     
+        // 🚨 Primera vez: NO hay caja asignada
         if (cajaExistenteOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existe caja asignada al usuario.");
+            if (cajaRequest == null || cajaRequest.getMontoApertura() == null) {
+                return ResponseEntity.badRequest().body("Se requiere un monto de apertura inicial.");
+            }
+    
+            Cajas nuevaCaja = new Cajas();
+            nuevaCaja.setUsuario(usuario);
+            nuevaCaja.setEstadoCaja("abierta");
+            nuevaCaja.setFechaApertura(new Date());
+            nuevaCaja.setMontoApertura(cajaRequest.getMontoApertura());
+            nuevaCaja.setSaldoFisico(cajaRequest.getMontoApertura());
+            nuevaCaja.setSaldoTotal(cajaRequest.getMontoApertura());
+    
+            return ResponseEntity.ok(serviceCaja.guardar(nuevaCaja));
         }
     
+        // 🧠 Caja ya existe → reapertura
         Cajas caja = cajaExistenteOpt.get();
     
         if ("abierta".equalsIgnoreCase(caja.getEstadoCaja())) {
             return ResponseEntity.badRequest().body("La caja ya está aperturada.");
         }
     
-        // Asumimos que saldoFisico fue actualizado correctamente al cerrar
         if (caja.getSaldoFisico() == null) {
-            return ResponseEntity.badRequest().body("No se puede aperturar porque el saldo físico anterior es nulo.");
+            return ResponseEntity.badRequest().body("No se puede reaperturar porque el saldo físico anterior es nulo.");
         }
+    
+        // ✅ Si se mandó un nuevo monto, úsalo
+        Double nuevoMonto = (cajaRequest != null && cajaRequest.getMontoApertura() != null)
+            ? cajaRequest.getMontoApertura()
+            : caja.getSaldoFisico();
     
         caja.setEstadoCaja("abierta");
         caja.setFechaApertura(new Date());
-        caja.setMontoApertura(caja.getSaldoFisico());
-        caja.setSaldoFisico(caja.getSaldoFisico()); // reinicia el saldo con base al saldo físico
+        caja.setMontoApertura(nuevoMonto);
+        caja.setSaldoFisico(nuevoMonto);
+        caja.setSaldoTotal(nuevoMonto);
+
+        TransaccionesCaja transaccion = new TransaccionesCaja();
+        transaccion.setCaja(caja);
+        transaccion.setFechaHoraTransaccion(new Date());
+        transaccion.setMontoTransaccion(caja.getMontoApertura());
+
+        transaccion.setTipo(transaccionesCajaService.obtenerTipoPorId(3));
+
+        transaccionesCajaService.guardar(transaccion);
     
         return ResponseEntity.ok(serviceCaja.guardar(caja));
     }
+    
+    
     
 
     @PostMapping("/cerrar")
@@ -99,13 +151,35 @@ public class CajaController {
         }
     
         Cajas caja = cajaAbierta.get();
-        caja.setMontoCierre(montoCierre);
+    
+        TransaccionesCaja transaccion = new TransaccionesCaja();
+        transaccion.setCaja(caja);
+        transaccion.setFechaHoraTransaccion(new Date());
+        transaccion.setMontoTransaccion(montoCierre);
+
+        transaccion.setTipo(transaccionesCajaService.obtenerTipoPorId(4));
+
+        transaccionesCajaService.guardar(transaccion);
+
+        caja.setMontoCierre(caja.getSaldoTotal());
         caja.setSaldoFisico(montoCierre); // ⬅️ ESTO ES CLAVE
         caja.setFechaCierre(new Date());
         caja.setEstadoCaja("cerrada");
         caja.setUsuarioCierre(usuario);
-    
+
         return ResponseEntity.ok(serviceCaja.guardar(caja));
-    }    
+    }
+
+    @GetMapping("/admin/listar")
+    public ResponseEntity<?> listarTodasLasCajas() {
+    Usuarios usuario = getUsuarioAutenticado();
+    
+    if (!usuario.getRol().getNombreRol().equalsIgnoreCase("ADMIN")) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No autorizado");
+    }
+
+    return ResponseEntity.ok(serviceCaja.buscarTodos());
+}
+
     
 }

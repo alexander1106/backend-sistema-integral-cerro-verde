@@ -60,5 +60,10 @@ public class ArqueosCajaServiceImpl implements ArqueosCajaService {
     public Optional<ArqueosCaja> buscarPorCaja(Cajas caja) {
         return repository.findByCaja(caja);
     }
+
+    @Override
+    public List<ArqueosCaja> buscarTodosPorCaja(Cajas caja) {
+        return repository.findAllByCaja(caja);
+    }
     
 }
