@@ -26,7 +26,6 @@ public class ApiService {
             .header("Authorization", "Bearer " + TOKEN) // Agrega el token en header
             .retrieve()
             .bodyToMono(String.class);
-
         return respuesta.block(); // bloquea hasta que obtenga respuesta
     }
 }

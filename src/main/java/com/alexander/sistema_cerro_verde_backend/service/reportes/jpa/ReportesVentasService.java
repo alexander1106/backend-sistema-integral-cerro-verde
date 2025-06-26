@@ -2,12 +2,24 @@ package com.alexander.sistema_cerro_verde_backend.service.reportes.jpa;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.jfree.chart.JFreeChart;
+import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Drawing;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
+import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -18,12 +30,13 @@ import com.alexander.sistema_cerro_verde_backend.entity.reportes.HabitacionVenta
 import com.alexander.sistema_cerro_verde_backend.entity.reportes.PagoVentasDTO;
 import com.alexander.sistema_cerro_verde_backend.entity.reportes.PagoVentasDetalladoDTO;
 import com.alexander.sistema_cerro_verde_backend.entity.reportes.ProductoVentasDTO;
+import com.alexander.sistema_cerro_verde_backend.entity.reportes.ReservasPorMesDTO;
 import com.alexander.sistema_cerro_verde_backend.entity.reportes.SalonVentasDTO;
 import com.alexander.sistema_cerro_verde_backend.entity.reportes.SalonVentasDetalladoDTO;
 import com.alexander.sistema_cerro_verde_backend.entity.reportes.VentaResumenDTO;
 import com.alexander.sistema_cerro_verde_backend.repository.ventas.VentasRepository;
-import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -36,17 +49,6 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
-
-import org.apache.poi.ss.usermodel.ClientAnchor;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.Drawing;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 @Service
 public class ReportesVentasService {
@@ -95,6 +97,31 @@ public class ReportesVentasService {
     public List<PagoVentasDetalladoDTO> obtenerMetodosPagoDetallado(String desde, String hasta) {
         return ventasRepo.findMetodosPagoDetallado(desde, hasta);
     }
+    public List<ReservasPorMesDTO> obtenerReservasPorMes(String tipo, String desde, String hasta) {
+    List<Object[]> raw;
+
+    if ("habitaciones".equalsIgnoreCase(tipo)) {
+        raw = ventasRepo.findRawReservasHabitacionesPorMes(desde, hasta);
+    } else if ("salones".equalsIgnoreCase(tipo)) {
+        raw = ventasRepo.findRawReservasSalonesPorMes(desde, hasta);
+    } else {
+        return Collections.emptyList();
+    }
+
+    return raw.stream()
+        .map(row -> {
+            String mes       = (String) row[0];
+            Number cntNum    = (Number) row[1];    // COUNT(*) → Number
+            Number totalNum  = (Number) row[2];    // SUM(...)   → Number
+            return new ReservasPorMesDTO(
+                mes,
+                cntNum.longValue(),               // cantidad
+                totalNum.doubleValue()            // total
+            );
+        })
+        .collect(Collectors.toList());
+}
+
 
     // Generación de PDF resumen con logo, gráfico y tabla
     public byte[] generarPdfResumen(String tipo, String desde, String hasta) {
@@ -500,7 +527,106 @@ public class ReportesVentasService {
         throw new RuntimeException("Error Excel Métodos Pago Detallado", e);
     }
 }
+// ----- Reservas por mes -----
+public ByteArrayInputStream generarPdfReservasPorMes(List<ReservasPorMesDTO> datos, String tituloReporte) {
+    try {
+        var baos = new ByteArrayOutputStream();
+        var writer = new PdfWriter(baos);
+        var pdf = new PdfDocument(writer);
+        var doc = new Document(pdf);
 
+        byte[] logo = loadLogoBytes();
+        if (logo != null) {
+            doc.add(new Image(ImageDataFactory.create(logo))
+                .scaleToFit(100, 50)
+                .setFixedPosition(36, pdf.getDefaultPageSize().getTop() - 60));
+        }
 
+        var font = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+        doc.add(new Paragraph(tituloReporte)
+            .setFont(font).setFontSize(16)
+            .setTextAlignment(TextAlignment.CENTER));
+        doc.add(new Paragraph("\n"));
+
+        // Gráfico
+        var ds = new DefaultCategoryDataset();
+        datos.forEach(d -> ds.addValue(d.getCantidad(), "Cantidad", d.getMes()));
+        var chart = ChartFactory.createBarChart("Reservas por Mes", "Mes", "Cantidad", ds);
+        var chartOut = new ByteArrayOutputStream();
+        ChartUtils.writeChartAsPNG(chartOut, chart, 500, 300);
+        doc.add(new Image(ImageDataFactory.create(chartOut.toByteArray())).setAutoScale(true));
+        doc.add(new Paragraph("\n"));
+
+        // Tabla
+        float[] widths = {200F, 100F};
+        var table = new Table(UnitValue.createPercentArray(widths)).useAllAvailableWidth();
+        var hs = new Style().setFont(font).setBackgroundColor(ColorConstants.LIGHT_GRAY).setTextAlignment(TextAlignment.CENTER);
+        table.addHeaderCell(new Cell().add(new Paragraph("Mes")).addStyle(hs));
+        table.addHeaderCell(new Cell().add(new Paragraph("Cantidad")).addStyle(hs));
+        for (var d : datos) {
+            table.addCell(d.getMes());
+            table.addCell(String.valueOf(d.getCantidad()));
+        }
+
+        doc.add(table);
+        doc.close();
+        return new ByteArrayInputStream(baos.toByteArray());
+    } catch (Exception e) {
+        throw new RuntimeException("Error PDF Reservas por Mes", e);
+    }
 }
 
+public byte[] generarExcelReservasPorMes(List<ReservasPorMesDTO> datos, String tituloReporte) {
+    try (Workbook wb = new XSSFWorkbook(); var out = new ByteArrayOutputStream()) {
+        Sheet sh = wb.createSheet("Reservas por Mes");
+        CreationHelper ch = wb.getCreationHelper();
+
+        byte[] logo = loadLogoBytes();
+        if (logo != null) {
+            int idx = wb.addPicture(logo, Workbook.PICTURE_TYPE_PNG);
+            var dr = sh.createDrawingPatriarch();
+            var anc = ch.createClientAnchor(); anc.setCol1(0); anc.setRow1(0);
+            dr.createPicture(anc, idx).resize(1.5);
+        }
+
+        // Encabezado
+        Row hr = sh.createRow(4);
+        String[] headers = {"Mes", "Cantidad"};
+        var f = wb.createFont(); f.setBold(true);
+        var s = wb.createCellStyle(); s.setFont(f);
+        s.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
+        s.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        s.setAlignment(HorizontalAlignment.CENTER);
+        for (int i = 0; i < headers.length; i++) {
+            var c = hr.createCell(i); c.setCellValue(headers[i]); c.setCellStyle(s);
+        }
+
+        int r = 5;
+        for (var d : datos) {
+            var rw = sh.createRow(r++);
+            rw.createCell(0).setCellValue(d.getMes());
+            rw.createCell(1).setCellValue(d.getCantidad());
+        }
+        for (int i = 0; i < headers.length; i++) sh.autoSizeColumn(i);
+
+        // Gráfico
+        var ds = new DefaultCategoryDataset();
+        datos.forEach(d -> ds.addValue(d.getCantidad(), "Cantidad", d.getMes()));
+        var chart = ChartFactory.createBarChart(tituloReporte, "Mes", "Cantidad", ds);
+        var cout = new ByteArrayOutputStream();
+        ChartUtils.writeChartAsPNG(cout, chart, 500, 300);
+
+        int cid = wb.addPicture(cout.toByteArray(), Workbook.PICTURE_TYPE_PNG);
+        var cs = wb.createSheet("Gráfico");
+        var dr2 = cs.createDrawingPatriarch();
+        var anc2 = ch.createClientAnchor(); anc2.setCol1(0); anc2.setRow1(1);
+        dr2.createPicture(anc2, cid).resize();
+
+        wb.write(out);
+        return out.toByteArray();
+    } catch (Exception e) {
+        throw new RuntimeException("Error Excel Reservas por Mes", e);
+    }
+}
+
+}

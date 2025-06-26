@@ -77,7 +77,6 @@ public class AuthenticationController {
 
     @GetMapping("/usuario-actual")
     public Usuarios  obtenerUsuarioActual(Principal principal){
-        System.out.println("Principal: " + principal);
         return (Usuarios) this.userxDetailsServiceImpl.loadUserByUsername(principal.getName());
     }
 }

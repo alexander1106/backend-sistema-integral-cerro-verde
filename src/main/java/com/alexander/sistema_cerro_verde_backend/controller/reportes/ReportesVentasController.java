@@ -1,5 +1,6 @@
 package com.alexander.sistema_cerro_verde_backend.controller.reportes;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import org.springframework.http.HttpHeaders;
@@ -19,6 +20,7 @@ import com.alexander.sistema_cerro_verde_backend.entity.reportes.HabitacionVenta
 import com.alexander.sistema_cerro_verde_backend.entity.reportes.PagoVentasDTO;
 import com.alexander.sistema_cerro_verde_backend.entity.reportes.PagoVentasDetalladoDTO;
 import com.alexander.sistema_cerro_verde_backend.entity.reportes.ProductoVentasDTO;
+import com.alexander.sistema_cerro_verde_backend.entity.reportes.ReservasPorMesDTO;
 import com.alexander.sistema_cerro_verde_backend.entity.reportes.SalonVentasDTO;
 import com.alexander.sistema_cerro_verde_backend.entity.reportes.SalonVentasDetalladoDTO;
 import com.alexander.sistema_cerro_verde_backend.service.reportes.jpa.ReportesVentasService;
@@ -220,5 +222,72 @@ public class ReportesVentasController {
         );
         return new ResponseEntity<>(content, headers, HttpStatus.OK);
     }
+
+    // ----- Endpoints Reservas por mes (PDF / Excel) -----
+    @GetMapping("/reservas-por-mes")
+        public ResponseEntity<List<ReservasPorMesDTO>> getReservasPorMesJson(
+        @RequestParam String tipo,      // "habitaciones" o "salones"
+        @RequestParam String desde,
+        @RequestParam String hasta) {
+
+        List<ReservasPorMesDTO> datos = service.obtenerReservasPorMes(tipo, desde, hasta);
+        return ResponseEntity.ok(datos);
+        }
+        
+    @GetMapping("/reservas-por-mes/pdf")
+        public ResponseEntity<byte[]> downloadPdfReservasPorMes(
+                @RequestParam String tipo,     // "habitaciones" o "salones"
+                @RequestParam String desde,
+                @RequestParam String hasta) {
+
+        // 1) obtener los datos
+        List<ReservasPorMesDTO> datos = service.obtenerReservasPorMes(tipo, desde, hasta);
+
+        // 2) armar título
+        String titulo = tipo.equalsIgnoreCase("habitaciones")
+                ? "Reservas por Mes - Habitaciones"
+                : "Reservas por Mes - Salones";
+
+        // 3) generar PDF
+        ByteArrayInputStream pdfStream = service.generarPdfReservasPorMes(datos, titulo);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData(
+                "attachment",
+                String.format("reservas_por_mes_%s_%s_a_%s.pdf", tipo, desde, hasta)
+        );
+
+        return new ResponseEntity<>(pdfStream.readAllBytes(), headers, HttpStatus.OK);
+        }
+
+     @GetMapping("/reservas-por-mes/excel")
+        public ResponseEntity<byte[]> downloadExcelReservasPorMes(
+                @RequestParam String tipo,
+                @RequestParam String desde,
+                @RequestParam String hasta) {
+
+        // 1) obtener los datos
+        List<ReservasPorMesDTO> datos = service.obtenerReservasPorMes(tipo, desde, hasta);
+
+        // 2) armar título
+        String titulo = tipo.equalsIgnoreCase("habitaciones")
+                ? "Reservas por Mes - Habitaciones"
+                : "Reservas por Mes - Salones";
+
+        // 3) generar Excel
+        byte[] excel = service.generarExcelReservasPorMes(datos, titulo);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        headers.setContentDispositionFormData(
+                "attachment",
+                String.format("reservas_por_mes_%s_%s_a_%s.xlsx", tipo, desde, hasta)
+        );
+
+        return new ResponseEntity<>(excel, headers, HttpStatus.OK);
+        }
+
 
 }

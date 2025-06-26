@@ -308,4 +308,42 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
         @Param("desde") String desde,
         @Param("hasta") String hasta
     );
+
+
+    // Para habitaciones por mes
+    @Query(value = """
+    SELECT
+      MONTHNAME(STR_TO_DATE(v.fecha, '%Y-%m-%d')) AS mes,
+      COUNT(*)                                  AS cantidad,
+      COALESCE(SUM(vh.sub_total), 0)            AS total
+    FROM ventas v
+    JOIN venta_habitacion vh ON v.id_venta = vh.id_venta
+    WHERE v.fecha BETWEEN :desde AND :hasta
+      AND v.estado = 1
+    GROUP BY MONTH(STR_TO_DATE(v.fecha, '%Y-%m-%d'))
+    ORDER BY MONTH(STR_TO_DATE(v.fecha, '%Y-%m-%d'))
+    """, nativeQuery = true)
+  List<Object[]> findRawReservasHabitacionesPorMes(
+      @Param("desde") String desde,
+      @Param("hasta") String hasta
+  );
+
+  // Para salones por mes
+  @Query(value = """
+    SELECT
+      MONTHNAME(STR_TO_DATE(v.fecha, '%Y-%m-%d')) AS mes,
+      COUNT(*)                                  AS cantidad,
+      COALESCE(SUM(vs.sub_total), 0)            AS total
+    FROM ventas v
+    JOIN venta_salon vs ON v.id_venta = vs.id_venta
+    WHERE v.fecha BETWEEN :desde AND :hasta
+      AND v.estado = 1
+    GROUP BY MONTH(STR_TO_DATE(v.fecha, '%Y-%m-%d'))
+    ORDER BY MONTH(STR_TO_DATE(v.fecha, '%Y-%m-%d'))
+    """, nativeQuery = true)
+  List<Object[]> findRawReservasSalonesPorMes(
+      @Param("desde") String desde,
+      @Param("hasta") String hasta
+  );
+
 }

@@ -134,6 +134,21 @@
         <type>pom</type>
         </dependency>
 
+        <!-- Para generar los gráficos con JFreeChart -->
+        <dependency>
+        <groupId>org.jfree</groupId>
+        <artifactId>jfreechart</artifactId>
+        <version>1.5.3</version>
+        </dependency>
+
+        <!-- Para IO utilities (logo) -->
+        <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.11.0</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

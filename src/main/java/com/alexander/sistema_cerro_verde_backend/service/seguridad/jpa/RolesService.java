@@ -92,13 +92,11 @@ public Roles actualizarRol(Roles rol) {
 
     @Override
     public List<Permisos> obtenerPermisosPorRol(Integer idRol) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'obtenerPermisosPorRol'");
     }
 
     @Override
     public Roles asignarPermisosARol(Integer idRol, List<Integer> idPermisos) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'asignarPermisosARol'");
     }
 
