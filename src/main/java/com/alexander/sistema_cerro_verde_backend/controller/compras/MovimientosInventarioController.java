@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alexander.sistema_cerro_verde_backend.dto.compras.MovimientoInventarioDTO;
 import com.alexander.sistema_cerro_verde_backend.entity.compras.MovimientosInventario;
 import com.alexander.sistema_cerro_verde_backend.service.compras.IMovimientosInventarioService;
 
@@ -23,8 +24,9 @@ import com.alexander.sistema_cerro_verde_backend.service.compras.IMovimientosInv
 public class MovimientosInventarioController {
     @Autowired
     private IMovimientosInventarioService serviceMovimientosInventario;
+
     @GetMapping("/movimientosinventario")
-    public List<MovimientosInventario> buscarTodos() {
+    public List<MovimientoInventarioDTO> buscarTodos() {
         return serviceMovimientosInventario.buscarTodos(); //findAll
     }
     @PostMapping("/movimientosinventario")
@@ -38,7 +40,7 @@ public class MovimientosInventarioController {
         return movimientoinventario;
     }
     @GetMapping("/movimientosinventario/{id}")
-    public Optional<MovimientosInventario> buscarId(@PathVariable("id") Integer id_movimiento_inventario) {
+    public Optional<MovimientoInventarioDTO> buscarId(@PathVariable("id") Integer id_movimiento_inventario) {
         return serviceMovimientosInventario.buscarId(id_movimiento_inventario);
     }
     @DeleteMapping("/movimientosinventario/{id}")

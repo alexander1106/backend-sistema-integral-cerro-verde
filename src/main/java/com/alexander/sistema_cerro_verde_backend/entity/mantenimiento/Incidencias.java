@@ -16,7 +16,7 @@ import org.hibernate.annotations.Where;
 
 import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Habitaciones;
-import com.alexander.sistema_cerro_verde_backend.entity.seguridad.Usuarios;
+import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Salones;
 
 @Entity
 @Table(name = "incidencias")
@@ -31,6 +31,8 @@ public class Incidencias {
     private Date fecha_solucion;
     private String estado_incidencia;
     private String descripcion;
+
+    private String gravedad;
 
     // NUEVO CAMPO: Observaciones cuando se completa la incidencia ✅
     private String observaciones_solucion;
@@ -50,12 +52,12 @@ public class Incidencias {
     private TipoIncidencia tipoIncidencia;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario")
-    private Usuarios usuario;
-
-    @ManyToOne
     @JoinColumn(name = "id_area")
     private AreasHotel area;
+
+    @ManyToOne
+    @JoinColumn(name = "id_salon")
+    private Salones salon;
 
     // === GETTERS & SETTERS ===
 
@@ -139,14 +141,6 @@ public class Incidencias {
         this.tipoIncidencia = tipoIncidencia;
     }
 
-    public Usuarios getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuarios usuario) {
-        this.usuario = usuario;
-    }
-
     public AreasHotel getArea() {
         return area;
     }
@@ -155,19 +149,29 @@ public class Incidencias {
         this.area = area;
     }
 
+    public Salones getSalon() {
+        return salon;
+    }
+
+    public void setSalon(Salones salon) {
+        this.salon = salon;
+    }
+
+    public String getGravedad() {
+        return gravedad;
+    }
+
+    public void setGravedad(String gravedad) {
+        this.gravedad = gravedad;
+    }
+
     @Override
     public String toString() {
-        return "Incidencias [id_incidencia=" + id_incidencia + 
-                ", fecha_registro=" + fecha_registro +
-                ", fecha_solucion=" + fecha_solucion + 
-                ", estado_incidencia=" + estado_incidencia +
-                ", descripcion=" + descripcion + 
-                ", observaciones_solucion=" + observaciones_solucion + 
-                ", estado=" + estado + 
-                ", sucursal=" + sucursal + 
-                ", habitacion=" + habitacion +
-                ", tipoIncidencia=" + tipoIncidencia + 
-                ", usuario=" + usuario + 
-                ", area=" + area + "]";
+        return "Incidencias [id_incidencia=" + id_incidencia + ", fecha_registro=" + fecha_registro
+                + ", fecha_solucion=" + fecha_solucion + ", estado_incidencia=" + estado_incidencia + ", descripcion="
+                + descripcion + ", gravedad=" + gravedad + ", observaciones_solucion=" + observaciones_solucion
+                + ", estado=" + estado + ", sucursal=" + sucursal + ", habitacion=" + habitacion + ", tipoIncidencia="
+                + tipoIncidencia + ", area=" + area + ", salon=" + salon + "]";
     }
+
 }

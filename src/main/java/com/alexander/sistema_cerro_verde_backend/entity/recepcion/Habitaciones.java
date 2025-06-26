@@ -27,13 +27,16 @@ public class Habitaciones {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id_habitacion;
     private Integer numero;
-    private Integer piso;
     private String estado_habitacion;
     private Integer estado = 1;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_sucursal")
     private Sucursales sucursal;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_piso")
+    private Pisos piso;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_tipo_habitacion")
@@ -103,11 +106,11 @@ public class Habitaciones {
         this.tipo_habitacion = tipo_habitacion;
     }
 
-    public Integer getPiso() {
+    public Pisos getPiso() {
         return piso;
     }
 
-    public void setPiso(Integer piso) {
+    public void setPiso(Pisos piso) {
         this.piso = piso;
     }
 

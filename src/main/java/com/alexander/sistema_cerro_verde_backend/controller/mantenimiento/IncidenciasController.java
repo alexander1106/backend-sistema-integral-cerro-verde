@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alexander.sistema_cerro_verde_backend.entity.mantenimiento.Incidencias;
-import com.alexander.sistema_cerro_verde_backend.entity.seguridad.Usuarios;
-import com.alexander.sistema_cerro_verde_backend.repository.seguridad.UsuariosRepository;
+import com.alexander.sistema_cerro_verde_backend.service.SmsService;
 import com.alexander.sistema_cerro_verde_backend.service.mantenimiento.jpa.IncidenciasService;
 
 
@@ -31,13 +28,7 @@ public class IncidenciasController {
     private IncidenciasService serviceIncidencias;
 
     @Autowired
-    private UsuariosRepository usuarioRepository;
-
-    private Usuarios getUsuarioAutenticado() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        return usuarioRepository.findByUsername(username);
-    }
+    private SmsService mensajeService;
     
     @GetMapping("/ver") //Ver
     public List<Incidencias> buscarTodos() {
@@ -52,9 +43,23 @@ public class IncidenciasController {
     @PostMapping("/registrar") //Registrar
     public Incidencias registrar(@RequestBody Incidencias incidencias) {
         incidencias.setEstado_incidencia("pendiente");
-        Usuarios usuario = getUsuarioAutenticado();
-        incidencias.setUsuario(usuario);
         serviceIncidencias.registrar(incidencias);
+
+        String ubicacion = "";
+
+        if (incidencias.getHabitacion() != null) {
+            ubicacion = "habitación: " + incidencias.getHabitacion().getNumero() 
+                        + " - " + incidencias.getHabitacion().getPiso();
+        } else if (incidencias.getArea() != null) {
+            ubicacion = "Área: " + incidencias.getArea().getNombre(); 
+        } else if (incidencias.getSalon() != null) {
+            ubicacion = "Salón: " + incidencias.getSalon().getNombre(); 
+        }
+
+        String mensaje = "\n Incidencia en "+ubicacion+
+                        "\n TIPO: "+incidencias.getTipoIncidencia();        
+
+        //mensajeService.enviarSms(mensaje);
         return incidencias;
     }
 

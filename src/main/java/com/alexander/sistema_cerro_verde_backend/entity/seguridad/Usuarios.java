@@ -7,8 +7,6 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.alexander.sistema_cerro_verde_backend.entity.mantenimiento.Incidencias;
-import com.alexander.sistema_cerro_verde_backend.entity.mantenimiento.Limpiezas;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.Ventas;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -50,14 +48,6 @@ public class Usuarios implements UserDetails {
     @JsonIgnore
     private List<Ventas> venta;
 
-    @OneToMany(mappedBy = "usuario")
-    @JsonIgnore
-    private List<Incidencias> incidencias;
-
-    @OneToMany(mappedBy ="usuario")
-    @JsonIgnore
-    private List<Limpiezas> limpiezas;
-
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -66,7 +56,16 @@ public class Usuarios implements UserDetails {
         return authorities;
     }
 
-
+    @Column(name = "jwt_token")
+    private String jwtToken;
+    
+    public String getJwtToken() {
+        return jwtToken;
+    }
+    
+    public void setJwtToken(String jwtToken) {
+        this.jwtToken = jwtToken;
+    }
 
     
     public Integer getIdUsuario() {
@@ -177,24 +176,6 @@ public class Usuarios implements UserDetails {
 
     public void setVenta(List<Ventas> venta) {
         this.venta = venta;
-    }
-
-    public List<Incidencias> getIncidencias() {
-        return incidencias;
-    }
-
-    public void setIncidencias(List<Incidencias> incidencias) {
-        this.incidencias = incidencias;
-    }
-
-
-    public List<Limpiezas> getLimpiezas() {
-        return limpiezas;
-    }
-
-
-    public void setLimpiezas(List<Limpiezas> limpiezas) {
-        this.limpiezas = limpiezas;
     }
 
     public String getToken() {

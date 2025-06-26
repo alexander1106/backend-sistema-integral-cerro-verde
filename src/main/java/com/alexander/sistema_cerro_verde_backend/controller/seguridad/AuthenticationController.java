@@ -41,17 +41,16 @@ public class AuthenticationController {
     
     @PostMapping("/generar-token")
     public ResponseEntity<?> generarToken(@RequestBody JwtRequest jwtRequest) throws Exception {
-        System.out.println("vamos a generar el token con" + jwtRequest.getUsername());
-
+        System.out.println("Intentando autenticar al usuario: " + jwtRequest.getUsername());
+    
         try {
-            System.out.println("Intentando autenticar al usuario: " + jwtRequest.getUsername());
             autenticar(jwtRequest.getUsername(), jwtRequest.getPassword());
         } catch (UsuarioFoundException exception) {
             exception.printStackTrace();
             throw new Exception("Usuario no encontrado");
         }
-        UserDetails userDetails = this.userxDetailsServiceImpl.loadUserByUsername(jwtRequest.getUsername()); 
-        System.out.println("Usuario autenticado correctamente: " + userDetails.getUsername());
+    
+        UserDetails userDetails = this.userxDetailsServiceImpl.loadUserByUsername(jwtRequest.getUsername());
         String token = this.jwtUtils.generateToken(userDetails);
         System.out.println("Token generado: " + token); // <-- Esto te dirá si el token realmente se generó
 
@@ -61,6 +60,7 @@ public class AuthenticationController {
         
         return ResponseEntity.ok(new JwtResponse(token));
     }
+    
     
   
     private void autenticar(String username, String password) throws Exception {

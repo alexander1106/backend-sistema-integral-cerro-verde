@@ -2,6 +2,10 @@ package com.alexander.sistema_cerro_verde_backend.entity.caja;
 
 import java.util.Date;
 
+import com.alexander.sistema_cerro_verde_backend.entity.ventas.MetodosPago;
+import com.alexander.sistema_cerro_verde_backend.entity.ventas.Ventas;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,6 +33,15 @@ public class TransaccionesCaja {
     @ManyToOne
     @JoinColumn(name = "id_tipo_transacciones")
     private TipoTransacciones tipo;
+
+    @ManyToOne
+    @JoinColumn(name = "id_venta")
+    @JsonBackReference(value="venta")
+    private Ventas venta;
+
+    @ManyToOne
+    @JoinColumn(name = "id_metodo_pago")
+    private MetodosPago metodoPago;
 
     private Integer estado = 1;
 
@@ -85,6 +98,22 @@ public class TransaccionesCaja {
         return "TransaccionesCaja [id=" + id + ", montoTransaccion=" + montoTransaccion + ", fechaHoraTransaccion="
                 + fechaHoraTransaccion + ", caja=" + caja + ", tipo=" + tipo + ", estado="
                 + estado + "]";
+    }
+
+    public Ventas getVenta() {
+        return venta;
+    }
+
+    public void setVenta(Ventas venta) {
+        this.venta = venta;
+    }
+
+    public MetodosPago getMetodoPago() {
+        return metodoPago;
+    }
+
+    public void setMetodoPago(MetodosPago metodoPago) {
+        this.metodoPago = metodoPago;
     }
 
 

@@ -63,6 +63,7 @@ public class SalonesServiceImpl implements SalonesService{
     return repository.findById(salon.getId_salon())
         .map(existente -> {
             existente.setNombre(salon.getNombre());
+            existente.setCapacidad(salon.getCapacidad());
             existente.setEstado_salon(salon.getEstado_salon());
             existente.setPrecio_diario(salon.getPrecio_diario());
             existente.setPrecio_hora(salon.getPrecio_hora());

@@ -39,6 +39,7 @@ public class IncidenciasService implements IIncidenciasService{
         metodoActualizar.setEstado_incidencia(incidencias.getEstado_incidencia());
         metodoActualizar.setFecha_registro(incidencias.getFecha_registro());
         metodoActualizar.setFecha_solucion(incidencias.getFecha_solucion());
+        metodoActualizar.setGravedad(incidencias.getGravedad());
         repoIncidencias.save(metodoActualizar);
     }
 

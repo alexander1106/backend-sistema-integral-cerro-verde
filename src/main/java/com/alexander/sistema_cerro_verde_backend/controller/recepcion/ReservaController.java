@@ -1,6 +1,7 @@
 package com.alexander.sistema_cerro_verde_backend.controller.recepcion;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,10 +79,25 @@ public class ReservaController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar la reserva: " + e.getMessage());
     }
 
+    }
 
-}
+    @PutMapping("/cancelar/{id}")
+    public ResponseEntity<?> cancelar(@PathVariable Integer id) {
+        try {
+            reservaService.cancelar(id); // Aquí ya estás cancelando
 
+            return ResponseEntity.ok(Map.of(
+                "mensaje", "Reserva cancelada correctamente",
+                "reservaId", id
+            ));
 
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "error", e.getMessage()
+            ));
+        }
+    }
+    
 
 }
 

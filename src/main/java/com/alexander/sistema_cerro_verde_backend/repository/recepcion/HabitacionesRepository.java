@@ -15,6 +15,10 @@ public interface HabitacionesRepository extends JpaRepository<Habitaciones, Inte
 
 @Query("SELECT hxr.habitacion FROM HabitacionesXReserva hxr WHERE hxr.estado = 1")
     List<Habitaciones> findHabitacionesActivasEnReservas();
+
+    @Query("SELECT COALESCE(COUNT(r), 0) FROM Habitaciones r WHERE r.piso.id_piso = :idPiso AND r.estado = 1")
+    Integer contarHabitacionesActivasPorPiso(@Param("idPiso") Integer idPiso);
+
 }
 
 

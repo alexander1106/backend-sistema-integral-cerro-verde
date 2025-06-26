@@ -35,7 +35,9 @@ public class LimpiezasService implements ILimpiezasService{
     @Override //Actualizar
     public void actualizar (Integer id, Limpiezas limpiezas) {
         Limpiezas metodoActualizar = repoLimpiezas.findById(id).orElse(null);
-        metodoActualizar.setFecha_hora_limpieza(limpiezas.getFecha_hora_limpieza());
+        metodoActualizar.setFecha_registro(limpiezas.getFecha_registro());
+        metodoActualizar.setFecha_solucion(limpiezas.getFecha_solucion());
+        metodoActualizar.setEstado_limpieza(limpiezas.getEstado_limpieza());
         metodoActualizar.setObservaciones(limpiezas.getObservaciones());
         repoLimpiezas.save(metodoActualizar);
     }

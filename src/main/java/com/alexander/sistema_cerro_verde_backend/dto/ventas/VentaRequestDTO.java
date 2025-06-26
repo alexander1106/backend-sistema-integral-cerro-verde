@@ -7,7 +7,8 @@ import com.alexander.sistema_cerro_verde_backend.entity.ventas.VentaHabitacion;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.VentaMetodoPago;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.VentaSalon;
 
-public class VentaDTO {
+public class VentaRequestDTO {
+
     private Integer idVenta;
     private String numComprobante;
     private String numSerieBoleta;
@@ -20,18 +21,23 @@ public class VentaDTO {
     private Double cargo;
     private Double igv;
     private String estadoVenta;
-    
-    //Mostrar los arrays de detalleventas
+
+    // IDs de reserva asociada (si aplica)
+    private List<Integer> idsReservas;
+
+    // Detalle de productos
     private List<DetalleVenta> detalleVenta;
 
-    //Mostrar los arrays de ventaXHabitacion
+    // Habitaciones
     private List<VentaHabitacion> detalleHabitacion;
 
-    //Mostrar los arrays de ventaXSalon
+    // Salones
     private List<VentaSalon> detalleSalon;
 
-    //Mostrar los arrays de metodoPago
+    // Métodos de pago
     private List<VentaMetodoPago> metodosPago;
+
+    // Getters y Setters
 
     public Integer getIdVenta() {
         return idVenta;
@@ -63,6 +69,14 @@ public class VentaDTO {
 
     public void setNumSerieFactura(String numSerieFactura) {
         this.numSerieFactura = numSerieFactura;
+    }
+
+    public String getDniRucCliente() {
+        return dniRucCliente;
+    }
+
+    public void setDniRucCliente(String dniRucCliente) {
+        this.dniRucCliente = dniRucCliente;
     }
 
     public String getCliente() {
@@ -113,6 +127,14 @@ public class VentaDTO {
         this.igv = igv;
     }
 
+    public String getEstadoVenta() {
+        return estadoVenta;
+    }
+
+    public void setEstadoVenta(String estadoVenta) {
+        this.estadoVenta = estadoVenta;
+    }
+
     public List<DetalleVenta> getDetalleVenta() {
         return detalleVenta;
     }
@@ -145,21 +167,11 @@ public class VentaDTO {
         this.metodosPago = metodosPago;
     }
 
-    public String getDniRucCliente() {
-        return dniRucCliente;
+    public List<Integer> getIdsReservas() {
+        return idsReservas;
     }
 
-    public void setDniRucCliente(String dniRucCliente) {
-        this.dniRucCliente = dniRucCliente;
+    public void setIdsReservas(List<Integer> idsReservas) {
+        this.idsReservas = idsReservas;
     }
-
-    public String getEstadoVenta() {
-        return estadoVenta;
-    }
-
-    public void setEstadoVenta(String estadoVenta) {
-        this.estadoVenta = estadoVenta;
-    }
-
-    
 }

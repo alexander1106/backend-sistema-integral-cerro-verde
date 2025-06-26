@@ -8,11 +8,11 @@ import reactor.core.publisher.Mono;
 @Service
 public class ApiCliente {
     WebClient web = WebClient.create();
-    private final String TOKEN = "apis-token-14620.8grrglwKnM2Mrk29QMdUKuzrcUmeHHSq";
+    private final String TOKEN = "apis-token-16217.AT5XTgs7ZegVsB2bbdc1WtrGpJ6RMa3w";
 
     public ApiCliente(WebClient.Builder webClientBuilder) {
         this.web = webClientBuilder
-            .baseUrl("https://cerro-verde.apis.net.pe/v2")
+            .baseUrl("https://api.apis.net.pe/v2")
             .build();
     }
 

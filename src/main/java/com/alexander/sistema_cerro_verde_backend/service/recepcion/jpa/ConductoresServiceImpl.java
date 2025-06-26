@@ -69,6 +69,7 @@ public class ConductoresServiceImpl implements ConductoresService {
         .map(existente -> {
             existente.setDni(conductor.getDni());
             existente.setNombre(conductor.getNombre());
+            existente.setTelefono(conductor.getTelefono());
             existente.setPlaca(conductor.getPlaca());
             existente.setModelo_vehiculo(conductor.getModelo_vehiculo());
             return repository.save(existente);

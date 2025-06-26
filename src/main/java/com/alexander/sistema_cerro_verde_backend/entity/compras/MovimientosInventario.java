@@ -2,7 +2,6 @@ package com.alexander.sistema_cerro_verde_backend.entity.compras;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.annotations.Where;
 
 import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.Ventas;
@@ -36,12 +35,15 @@ public class MovimientosInventario {
     private Sucursales sucursal;
     @ManyToOne
     @JoinColumn(name = "id_compra")
+    @JsonIgnore
     private Compras compra;
     @ManyToOne
     @JoinColumn(name = "id_producto")
+    @JsonIgnore
     private Productos producto;
     @ManyToOne
     @JoinColumn(name = "id_venta")
+    @JsonIgnore
     private Ventas venta;
 
     public Integer getId_movimiento_inventario() {

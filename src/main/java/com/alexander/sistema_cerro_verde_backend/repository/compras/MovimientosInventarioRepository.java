@@ -19,4 +19,5 @@ public interface MovimientosInventarioRepository extends JpaRepository<Movimient
         @Param("fechaInicio") LocalDate fechaInicio,
         @Param("fechaFin") LocalDate fechaFin
     );
+    void deleteByVenta_IdVenta(Integer id);
 }

@@ -25,6 +25,7 @@ public class Salones {
     private Integer id_salon;
     private Double precio_diario;
     private Double precio_hora;
+    private Integer capacidad;
     private String nombre;
     private String estado_salon;
     private Integer estado = 1;
@@ -88,4 +89,11 @@ public class Salones {
     public void setSucursal(Sucursales sucursal) {
         this.sucursal = sucursal;
     }
+    public Integer getCapacidad() {
+        return capacidad;
+    }
+    public void setCapacidad(Integer capacidad) {
+        this.capacidad = capacidad;
+    }
+    
 }

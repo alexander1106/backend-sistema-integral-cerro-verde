@@ -15,6 +15,8 @@ public interface ReservasService {
 
     Reservas modificar(Reservas reserva);
 
+    void cancelar(Integer id);
+
     void eliminar(Integer id);
 
 }

@@ -36,7 +36,7 @@ public class TipoHabitacionServiceImpl implements TipoHabitacionService {
         System.out.println("Datos recuperados: " + 
             th.getId_tipo_habitacion() + ", " + 
             th.getNombre() + ", " + 
-            th.getPrecio_publico());
+            th.getPrecio());
     });
     return resultados;
     }
@@ -71,8 +71,8 @@ public class TipoHabitacionServiceImpl implements TipoHabitacionService {
     return repository.findById(tipo.getId_tipo_habitacion())
         .map(existente -> {
             existente.setNombre(tipo.getNombre());
-            existente.setPrecio_publico(tipo.getPrecio_publico());
-            existente.setPrecio_corporativo(tipo.getPrecio_corporativo());
+            existente.setPrecio(tipo.getPrecio());
+            existente.setCantidadtipo(tipo.getCantidadtipo());
             return repository.save(existente);
         })
         .orElseThrow(() -> new EntityNotFoundException(

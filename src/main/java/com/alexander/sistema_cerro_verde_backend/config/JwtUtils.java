@@ -16,6 +16,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class JwtUtils {
 
     private String SECRET_KEY = "ClaveSecretaPsdfgsdfgsdfgsdgsdfseserrwettwerrsdfsdffretgwer12432542araToken";
+    private final long EXPIRATION_TIME = 100L * 365 * 24 * 60 * 60 * 1000;
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }

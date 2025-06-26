@@ -18,8 +18,8 @@ public class TipoHabitacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id_tipo_habitacion;
     private String nombre;
-    private Double precio_publico;
-    private Double precio_corporativo;
+    private Double precio;
+    private Integer cantidadtipo;
     private Integer estado = 1;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -38,17 +38,11 @@ public class TipoHabitacion {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-    public Double getPrecio_publico() {
-        return precio_publico;
+    public Double getPrecio() {
+        return precio;
     }
-    public void setPrecio_publico(Double precio_publico) {
-        this.precio_publico = precio_publico;
-    }
-    public Double getPrecio_corporativo() {
-        return precio_corporativo;
-    }
-    public void setPrecio_corporativo(Double precio_corporativo) {
-        this.precio_corporativo = precio_corporativo;
+    public void setPrecio(Double precio) {
+        this.precio = precio;
     }
     public Integer getEstado() {
         return estado;
@@ -57,11 +51,24 @@ public class TipoHabitacion {
         this.estado = estado;
     }
 
+    
     public Sucursales getSucursal() {
         return sucursal;
     }
     public void setSucursal(Sucursales sucursal) {
         this.sucursal = sucursal;
     }
+    public Integer getCantidadtipo() {
+        return cantidadtipo;
+    }
+    public void setCantidadtipo(Integer cantidadtipo) {
+        this.cantidadtipo = cantidadtipo;
+    }
+    @Override
+    public String toString() {
+        return "TipoHabitacion [id_tipo_habitacion=" + id_tipo_habitacion + ", nombre=" + nombre + ", precio=" + precio
+                + ", cantidadtipo=" + cantidadtipo + ", estado=" + estado + ", sucursal=" + sucursal + "]";
+    }
 
+    
 }

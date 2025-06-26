@@ -19,6 +19,8 @@ public class Conductores {
     private Integer id_conductor;
     private String nombre;
     private String dni;
+    private String telefono;
+    private String estado_conductor = "Disponible";
     private String placa;
     private String modelo_vehiculo;
     private Integer estado = 1;
@@ -70,6 +72,28 @@ public class Conductores {
     public void setSucursal(Sucursales sucursal) {
         this.sucursal = sucursal;
     }
+    public String getTelefono() {
+        return telefono;
+    }
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+    public String getEstado_conductor() {
+        return estado_conductor;
+    }
+    public void setEstado_conductor(String estado_conductor) {
+        this.estado_conductor = estado_conductor;
+    }
+
+    @Override
+    public String toString() {
+        return "Conductores [id_conductor=" + id_conductor + ", nombre=" + nombre + ", dni=" + dni + ", nro_telefono="
+                + telefono + ", estado_conductor=" + estado_conductor + ", placa=" + placa + ", modelo_vehiculo="
+                + modelo_vehiculo + ", estado=" + estado + ", sucursal=" + sucursal + "]";
+    }
+   
+    
+   
 
     
 

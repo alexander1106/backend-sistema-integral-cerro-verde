@@ -47,6 +47,7 @@ public class HabitacionesReservaServiceImpl implements HabitacionesReservaServic
         Habitaciones habitacion = habitacionService.buscarId(habreserva.getHabitacion().getId_habitacion()).orElse(null);
         habreserva.setHabitacion(habitacion);
 
+        habreserva.setPrecio_reserva(habitacion.getTipo_habitacion().getPrecio());
         
         habitacion.setEstado_habitacion("Reservada");
         }

@@ -26,6 +26,7 @@ public class Recojo {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_sucursal")
     private Sucursales sucursal;
+    
     private String estado_recojo;
 
     @ManyToOne

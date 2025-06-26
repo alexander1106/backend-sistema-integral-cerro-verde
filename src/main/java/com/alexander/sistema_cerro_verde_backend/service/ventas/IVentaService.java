@@ -8,9 +8,9 @@ import com.alexander.sistema_cerro_verde_backend.entity.ventas.Ventas;
 
 public interface IVentaService {
 
-    List<VentaDTO> buscarTodos (); //Listar todas las ventas
+    List<Ventas> buscarTodos (); //Listar todas las ventas
     
-    Optional<VentaDTO> buscarPorId (Integer id); //Buscar venta por ID
+    Optional<Ventas> buscarPorId (Integer id); //Buscar venta por ID
 
     VentaDTO convertirDTO(Ventas venta);
 

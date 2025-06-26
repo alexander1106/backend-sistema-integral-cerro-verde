@@ -17,6 +17,7 @@ public class SalonesXReserva {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id_salon_reserv;
+    private Integer precioreserva;
     
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_salon")
@@ -60,6 +61,20 @@ public class SalonesXReserva {
 
     public void setEstado(Integer estado) {
         this.estado = estado;
+    }
+
+    public Integer getPrecioreserva() {
+        return precioreserva;
+    }
+
+    public void setPrecioreserva(Integer precioreserva) {
+        this.precioreserva = precioreserva;
+    }
+
+    @Override
+    public String toString() {
+        return "SalonesXReserva [id_salon_reserv=" + id_salon_reserv + ", precioreserva=" + precioreserva + ", salon="
+                + salon + ", reserva=" + reserva + ", estado=" + estado + "]";
     }
     
 }

@@ -10,4 +10,5 @@ public interface MetodoPagoRepository extends JpaRepository<MetodosPago, Integer
 
     @Query("SELECT COUNT(v) FROM VentaMetodoPago v WHERE v.metodoPago.idMetodoPago = :id")
     int countVentasByMetodoPagoId(@Param("id") Integer id);
+
 }

@@ -4,70 +4,51 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.alexander.sistema_cerro_verde_backend.entity.mantenimiento.Limpiezas;
-import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Habitaciones;
-import com.alexander.sistema_cerro_verde_backend.entity.seguridad.Usuarios;
 import com.alexander.sistema_cerro_verde_backend.service.mantenimiento.jpa.LimpiezasService;
-import com.alexander.sistema_cerro_verde_backend.service.recepcion.HabitacionesService;
-import com.alexander.sistema_cerro_verde_backend.service.seguridad.jpa.UsuariosService;
+
+
 
 @RestController
 @RequestMapping("/cerro-verde/limpiezas")
 @CrossOrigin("*")
 public class LimpiezasController {
-
     @Autowired
     private LimpiezasService serviceLimpiezas;
-
-    @Autowired
-    private UsuariosService serviceUsuario;
-
-    @Autowired
-    private HabitacionesService serviceHabitacion;
-
-    @GetMapping("/ver")
+    
+    @GetMapping("/ver") //Ver
     public List<Limpiezas> buscarTodos() {
         return serviceLimpiezas.buscarTodos();
     }
 
-    @GetMapping("/limpiezas/{id}")
-    public Optional<Limpiezas> buscarPorId(@PathVariable Integer id) {
+    @GetMapping("/limpiezas/{id}") //Ver por Id
+    public Optional<Limpiezas> buscarPorId(@PathVariable Integer id){
         return serviceLimpiezas.buscarPorId(id);
     }
 
-    @PostMapping("/registrar")
-    public Limpiezas registrarLimpieza(@RequestBody Limpiezas limpieza) {
-        // 🔒 Validación de usuario
-        Usuarios usuarioReal = serviceUsuario.obtenerUsuarioPorId(
-            limpieza.getUsuario().getIdUsuario()
-        );
-
-        // 🔒 Validación de habitación
-        Habitaciones habitacionReal = serviceHabitacion.buscarId(
-            limpieza.getHabitacion().getId_habitacion()
-        ).orElseThrow(() -> new RuntimeException("Habitación no encontrada"));
-
-        // 👇 Asignar las entidades persistentes
-        limpieza.setUsuario(usuarioReal);
-        limpieza.setHabitacion(habitacionReal);
-
-        // ✅ Guardar limpieza
-        serviceLimpiezas.registrar(limpieza);
-        return limpieza;
+    @PostMapping("/registrar") //Registrar
+    public Limpiezas registrar(@RequestBody Limpiezas limpiezas) {
+        serviceLimpiezas.registrar(limpiezas);
+        return limpiezas;
     }
 
-    @PostMapping("/actualizar/{id}")
-    public void actualizar(@PathVariable Integer id, @RequestBody Limpiezas limpiezas) {
-        // También puedes validar aquí si deseas actualizar usuario/habitación
+    @PutMapping("/actualizar/{id}") //Actualizar
+    public void actualizar (@PathVariable Integer id, @RequestBody Limpiezas limpiezas){
         serviceLimpiezas.actualizar(id, limpiezas);
     }
 
-    @GetMapping("/eliminar/{id}")
-    public void eliminarPorId(@PathVariable Integer id) {
+    @GetMapping("/eliminar/{id}") //Eliminar
+    public void eliminarPorId (@PathVariable Integer id){
         serviceLimpiezas.eliminarPorId(id);
     }
+
 }
-
-

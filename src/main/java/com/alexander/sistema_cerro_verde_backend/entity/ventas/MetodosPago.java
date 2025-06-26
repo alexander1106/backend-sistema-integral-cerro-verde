@@ -6,6 +6,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
+import com.alexander.sistema_cerro_verde_backend.entity.caja.TransaccionesCaja;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -41,6 +42,10 @@ public class MetodosPago {
     @OneToMany(mappedBy="metodoPago", cascade=CascadeType.ALL)
     @JsonIgnore
     private List<VentaMetodoPago> ventaMetodoPago;
+
+    @OneToMany(mappedBy="metodoPago", cascade=CascadeType.ALL)
+    @JsonIgnore
+    private List<TransaccionesCaja> transaccionCaja;
 
     public Integer getIdMetodoPago() {
         return idMetodoPago;
@@ -88,5 +93,13 @@ public class MetodosPago {
 
     public void setSucursal(Sucursales sucursal) {
         this.sucursal = sucursal;
+    }
+
+    public List<TransaccionesCaja> getTransaccionCaja() {
+        return transaccionCaja;
+    }
+
+    public void setTransaccionCaja(List<TransaccionesCaja> transaccionCaja) {
+        this.transaccionCaja = transaccionCaja;
     }
 }

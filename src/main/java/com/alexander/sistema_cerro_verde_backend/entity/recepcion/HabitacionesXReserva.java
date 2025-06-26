@@ -18,6 +18,7 @@ public class HabitacionesXReserva {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id_hab_reserv;
+    private Double precio_reserva;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_habitacion")
@@ -62,5 +63,13 @@ public class HabitacionesXReserva {
         this.estado = estado;
     }
 
+    public Double getPrecio_reserva() {
+        return precio_reserva;
+    }
+
+    public void setPrecio_reserva(Double precio_reserva) {
+        this.precio_reserva = precio_reserva;
+    }
+ 
     
 }
