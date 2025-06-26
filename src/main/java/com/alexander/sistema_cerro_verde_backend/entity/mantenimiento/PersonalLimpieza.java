@@ -15,7 +15,7 @@ import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 
 @Entity
 @Table(name = "personal_limpieza")
-@SQLDelete(sql = "UPDATE areas_hotel SET estado = 0 WHERE id_area = ?")
+@SQLDelete(sql = "UPDATE personal_limpieza SET estado = 0 WHERE id_personal_limpieza = ?")
 @Where(clause = "estado = 1")
 public class PersonalLimpieza {
     @Id

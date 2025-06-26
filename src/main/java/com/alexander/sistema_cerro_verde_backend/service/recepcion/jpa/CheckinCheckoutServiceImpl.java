@@ -11,12 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.TipoTransacciones;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.TransaccionesCaja;
+import com.alexander.sistema_cerro_verde_backend.entity.mantenimiento.Limpiezas;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.CheckinCheckout;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.HabitacionesXReserva;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.SalonesXReserva;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.VentaMetodoPago;
 import com.alexander.sistema_cerro_verde_backend.repository.caja.CajasRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.caja.TransaccionesCajaRepository;
+import com.alexander.sistema_cerro_verde_backend.repository.mantenimiento.LimpiezasRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.CheckinCheckoutRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.HabitacionesRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.HabitacionesReservaRepository;
@@ -61,6 +63,9 @@ public class CheckinCheckoutServiceImpl implements CheckinCheckoutService {
 
     @Autowired
     private TransaccionesCajaRepository repoTransacciones;
+
+    @Autowired
+    private LimpiezasRepository repoLimpiezas;
 
     @Override
     @Transactional(readOnly = true)
@@ -168,6 +173,13 @@ public class CheckinCheckoutServiceImpl implements CheckinCheckoutService {
                         List<HabitacionesXReserva> habitaciones = habitacionesReservasRepository.findByReservaId(reserva.getId_reserva());
                         for (HabitacionesXReserva hr : habitaciones) {
                             hr.getHabitacion().setEstado_habitacion("Limpieza");
+                            
+                            Limpiezas limpieza = new Limpiezas();
+                            limpieza.setEstado_limpieza("Pendiente");
+                            limpieza.setHabitacion(hr.getHabitacion());
+                            limpieza.setFecha_registro(new Date());
+                            repoLimpiezas.save(limpieza);
+
                             habitacionRepository.save(hr.getHabitacion());
                         }
 
@@ -175,6 +187,13 @@ public class CheckinCheckoutServiceImpl implements CheckinCheckoutService {
                         List<SalonesXReserva> salones = salonesReservasRepository.findByReservaId(reserva.getId_reserva());
                         for (SalonesXReserva sr : salones) {
                             sr.getSalon().setEstado_salon("Disponible");
+
+                            Limpiezas limpieza = new Limpiezas();
+                            limpieza.setEstado_limpieza("Pendiente");
+                            limpieza.setSalon(sr.getSalon());
+                            limpieza.setFecha_registro(new Date());
+                            repoLimpiezas.save(limpieza);
+
                             salonesRepository.save(sr.getSalon());
                         }
 
