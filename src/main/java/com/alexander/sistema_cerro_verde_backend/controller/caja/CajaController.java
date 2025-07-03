@@ -8,7 +8,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.alexander.sistema_cerro_verde_backend.entity.caja.Cajas;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.TransaccionesCaja;
@@ -49,7 +55,7 @@ public class CajaController {
         }
     
         // 🔍 Si no tiene caja y es CAJERO, se le crea una automáticamente
-        if (usuario.getRol().getNombreRol().equalsIgnoreCase("CAJERO") || usuario.getRol().getNombreRol().equalsIgnoreCase("ADMIN")) {
+        if (usuario.getRol().getNombreRol().equalsIgnoreCase("RECEPCIONISTA") || usuario.getRol().getNombreRol().equalsIgnoreCase("ADMIN")) {
             Cajas nuevaCaja = new Cajas();
             nuevaCaja.setUsuario(usuario);
             nuevaCaja.setEstadoCaja("cerrada");

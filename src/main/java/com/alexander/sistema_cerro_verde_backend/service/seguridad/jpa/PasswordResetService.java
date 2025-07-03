@@ -34,6 +34,7 @@ public class PasswordResetService implements IPasswordResetService {
 
     if (usuarioOpt.isPresent()) {
         Usuarios usuario = usuarioOpt.get();
+        
         String token = UUID.randomUUID().toString();
 
         PasswordResetToken resetToken = new PasswordResetToken();

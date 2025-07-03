@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +16,7 @@ import com.alexander.sistema_cerro_verde_backend.entity.caja.TipoTransacciones;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.TransaccionesCaja;
 import com.alexander.sistema_cerro_verde_backend.entity.compras.MovimientosInventario;
 import com.alexander.sistema_cerro_verde_backend.entity.compras.Productos;
+import com.alexander.sistema_cerro_verde_backend.entity.seguridad.Usuarios;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.DetalleVenta;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.VentaHabitacion;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.VentaMetodoPago;
@@ -24,6 +27,7 @@ import com.alexander.sistema_cerro_verde_backend.repository.caja.TransaccionesCa
 import com.alexander.sistema_cerro_verde_backend.repository.compras.MovimientosInventarioRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.compras.ProductosRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.ReservasRepository;
+import com.alexander.sistema_cerro_verde_backend.repository.seguridad.UsuariosRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.ventas.DetalleVentaRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.ventas.MetodoPagoRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.ventas.VentaHabitacionRepository;
@@ -70,6 +74,15 @@ public class VentaService implements IVentaService {
 
     @Autowired
     private TransaccionesCajaRepository repoTransacciones;
+
+        @Autowired
+    private UsuariosRepository usuarioRepository;
+
+    private Usuarios getUsuarioAutenticado() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        return usuarioRepository.findByUsername(username);
+    }
 
     @Override
     public List<Ventas> buscarTodos() {
@@ -139,7 +152,8 @@ public class VentaService implements IVentaService {
         });
 
         // 4. Registrar transacciones en caja si hay métodos de pago
-        var caja = repoCaja.findByEstadoCaja("abierta")
+        var usuario = getUsuarioAutenticado();
+        var caja = repoCaja.findByUsuarioAndEstadoCaja(usuario, "abierta")
                 .orElseThrow(() -> new RuntimeException("Caja no encontrada"));
 
         for (VentaMetodoPago m : ventaGuardada.getVentaMetodoPago()) {

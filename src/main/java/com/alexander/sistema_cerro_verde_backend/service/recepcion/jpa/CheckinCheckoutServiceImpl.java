@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,7 @@ import com.alexander.sistema_cerro_verde_backend.entity.mantenimiento.Limpiezas;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.CheckinCheckout;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.HabitacionesXReserva;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.SalonesXReserva;
+import com.alexander.sistema_cerro_verde_backend.entity.seguridad.Usuarios;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.VentaMetodoPago;
 import com.alexander.sistema_cerro_verde_backend.repository.caja.CajasRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.caja.TransaccionesCajaRepository;
@@ -25,6 +28,7 @@ import com.alexander.sistema_cerro_verde_backend.repository.recepcion.Habitacion
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.ReservasRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.SalonesRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.SalonesReservaRepository;
+import com.alexander.sistema_cerro_verde_backend.repository.seguridad.UsuariosRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.ventas.VentasRepository;
 import com.alexander.sistema_cerro_verde_backend.service.administrable.SucursalesService;
 import com.alexander.sistema_cerro_verde_backend.service.recepcion.CheckinCheckoutService;
@@ -66,6 +70,15 @@ public class CheckinCheckoutServiceImpl implements CheckinCheckoutService {
 
     @Autowired
     private LimpiezasRepository repoLimpiezas;
+
+    @Autowired
+    private UsuariosRepository usuarioRepository;
+
+    private Usuarios getUsuarioAutenticado() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        return usuarioRepository.findByUsername(username);
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -126,7 +139,8 @@ public class CheckinCheckoutServiceImpl implements CheckinCheckoutService {
                         repoVenta.save(venta);
 
                         // 2. Obtener caja abierta
-                        var caja = repoCaja.findByEstadoCaja("abierta")
+                        var usuario = getUsuarioAutenticado();
+                        var caja = repoCaja.findByUsuarioAndEstadoCaja(usuario, "abierta")
                                 .orElseThrow(() -> new RuntimeException("No hay caja abierta"));
 
                         // 3. Obtener tipo de transacción ingreso

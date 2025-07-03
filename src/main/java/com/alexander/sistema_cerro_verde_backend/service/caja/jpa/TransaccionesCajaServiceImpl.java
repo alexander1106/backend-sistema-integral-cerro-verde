@@ -4,15 +4,19 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alexander.sistema_cerro_verde_backend.entity.caja.Cajas;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.TipoTransacciones;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.TransaccionesCaja;
+import com.alexander.sistema_cerro_verde_backend.entity.seguridad.Usuarios;
 import com.alexander.sistema_cerro_verde_backend.repository.caja.CajasRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.caja.TipoTransaccionesRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.caja.TransaccionesCajaRepository;
+import com.alexander.sistema_cerro_verde_backend.repository.seguridad.UsuariosRepository;
 import com.alexander.sistema_cerro_verde_backend.service.caja.TransaccionesCajaService;
 
 @Service
@@ -26,6 +30,15 @@ public class TransaccionesCajaServiceImpl implements TransaccionesCajaService {
 
     @Autowired
     private CajasRepository cajaRepository;
+    
+    @Autowired
+    private UsuariosRepository usuarioRepository;
+
+    private Usuarios getUsuarioAutenticado() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        return usuarioRepository.findByUsername(username);
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -42,7 +55,8 @@ public class TransaccionesCajaServiceImpl implements TransaccionesCajaService {
     @Override
     @Transactional
     public TransaccionesCaja guardar(TransaccionesCaja transaccion) {
-        Optional<Cajas> cajaAbierta = cajaRepository.findByEstadoCaja("abierta"); // Suponiendo que 1 significa "abierta"
+        Usuarios usuario = getUsuarioAutenticado();
+        Optional<Cajas> cajaAbierta = cajaRepository.findByUsuarioAndEstadoCaja(usuario, "abierta"); // Suponiendo que 1 significa "abierta"
         
         if (cajaAbierta.isPresent()) {
             return repository.save(transaccion);

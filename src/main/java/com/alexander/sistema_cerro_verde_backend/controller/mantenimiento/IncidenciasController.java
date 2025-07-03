@@ -45,25 +45,13 @@ public class IncidenciasController {
         incidencias.setEstado_incidencia("pendiente");
         serviceIncidencias.registrar(incidencias);
 
-        String ubicacion = "";
+        String mensaje = "Incidencia creada";     
 
-        if (incidencias.getHabitacion() != null) {
-            ubicacion = "habitación: " + incidencias.getHabitacion().getNumero() 
-                        + " - " + incidencias.getHabitacion().getPiso();
-        } else if (incidencias.getArea() != null) {
-            ubicacion = "Área: " + incidencias.getArea().getNombre(); 
-        } else if (incidencias.getSalon() != null) {
-            ubicacion = "Salón: " + incidencias.getSalon().getNombre(); 
-        }
-
-        String mensaje = "\n Incidencia en "+ubicacion+
-                        "\n TIPO: "+incidencias.getTipoIncidencia();        
-
-        //mensajeService.enviarSms(mensaje);
+        mensajeService.enviarSms(mensaje);
         return incidencias;
     }
 
-    @PutMapping("/actualizar/{id}") //Actualizar
+    @PutMapping("/actualizar/{id}") //Actualizarq
     public void actualizar (@PathVariable Integer id, @RequestBody Incidencias incidencias){
         serviceIncidencias.actualizar(id, incidencias);
     }
