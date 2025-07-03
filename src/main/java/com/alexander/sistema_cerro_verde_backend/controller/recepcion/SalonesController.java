@@ -23,7 +23,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 @CrossOrigin("*") 
 @RestController
-@RequestMapping("/hoteleria/recepcion")
+@RequestMapping("/cerro-verde/recepcion")
 public class SalonesController {
 
     @Autowired
