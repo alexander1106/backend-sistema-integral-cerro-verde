@@ -67,10 +67,11 @@ public class HabitacionController {
     }
 
     @DeleteMapping("/habitaciones/eliminar/{id}")
-    public String eliminar(@PathVariable Integer id){
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id){
         habitacionesService.eliminar(id);
-        return "Habitacion eliminada";
+        return ResponseEntity.noContent().build(); // HTTP 204
     }
+
 
     
 }

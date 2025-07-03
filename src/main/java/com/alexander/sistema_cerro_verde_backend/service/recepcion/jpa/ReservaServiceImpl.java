@@ -10,7 +10,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.Cajas;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.TipoTransacciones;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.TransaccionesCaja;
@@ -19,6 +18,7 @@ import com.alexander.sistema_cerro_verde_backend.entity.recepcion.HabitacionesXR
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Reservas;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Salones;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.SalonesXReserva;
+import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.entity.seguridad.Usuarios;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.Clientes;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.VentaMetodoPago;
@@ -33,7 +33,6 @@ import com.alexander.sistema_cerro_verde_backend.repository.recepcion.SalonesRes
 import com.alexander.sistema_cerro_verde_backend.repository.seguridad.UsuariosRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.ventas.ClientesRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.ventas.VentasRepository;
-import com.alexander.sistema_cerro_verde_backend.service.administrable.SucursalesService;
 import com.alexander.sistema_cerro_verde_backend.service.caja.CajasService;
 import com.alexander.sistema_cerro_verde_backend.service.caja.TransaccionesCajaService;
 import com.alexander.sistema_cerro_verde_backend.service.recepcion.ReservasService;
@@ -64,9 +63,6 @@ public class ReservaServiceImpl implements ReservasService {
 
     @Autowired
     private ClientesRepository clientesRepository;
-
-    @Autowired
-    private SucursalesService sucursalService;
 
     @Autowired
     private CajasRepository cajaRepository;
@@ -102,11 +98,6 @@ public class ReservaServiceImpl implements ReservasService {
     @Override
     @Transactional
     public Reservas guardar(Reservas reserva) {
-
-        if (reserva.getSucursal() != null && reserva.getSucursal().getId() != null) {
-            Sucursales sucursal = sucursalService.buscarId(reserva.getSucursal().getId()).orElse(null);
-            reserva.setSucursal(sucursal);
-        }
 
         if (reserva.getCliente() != null && reserva.getCliente().getIdCliente() != null) {
             Clientes cliente = clientesService.buscarPorId(reserva.getCliente().getIdCliente()).orElse(null);
@@ -263,7 +254,7 @@ public class ReservaServiceImpl implements ReservasService {
 
         // Buscar caja activa del usuario
         Usuarios usuario = usuarioRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        Cajas caja = cajasService.buscarCajaAperturadaPorUsuario(usuario)
+            Cajas caja = cajasService.buscarCajaAperturadaPorUsuario(usuario)
                 .orElseThrow(() -> new RuntimeException("No hay una caja aperturada para este usuario"));
 
         // Buscar si hubo método de pago en efectivo

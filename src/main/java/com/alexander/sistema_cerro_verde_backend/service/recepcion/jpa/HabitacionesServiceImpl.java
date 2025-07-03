@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Habitaciones;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.TipoHabitacion;
+import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.HabitacionesRepository;
-import com.alexander.sistema_cerro_verde_backend.service.administrable.SucursalesService;
+import com.alexander.sistema_cerro_verde_backend.repository.recepcion.HabitacionesReservaRepository;
 import com.alexander.sistema_cerro_verde_backend.service.recepcion.HabitacionesService;
 import com.alexander.sistema_cerro_verde_backend.service.recepcion.TipoHabitacionService;
 
@@ -24,7 +24,7 @@ public class HabitacionesServiceImpl implements HabitacionesService {
 private HabitacionesRepository repository;
 
 @Autowired
-private SucursalesService sucursalService;
+private HabitacionesReservaRepository habitacionReservaRepository;
 
 @Autowired
 private TipoHabitacionService tipoHabitacionService;
@@ -38,13 +38,7 @@ private TipoHabitacionService tipoHabitacionService;
     @Override
     @Transactional
     public Habitaciones guardar(Habitaciones habitacion) {
-    if (habitacion.getSucursal() != null && habitacion.getSucursal().getId() != null) {
-        Sucursales sucursal = sucursalService.buscarId(habitacion.getSucursal().getId()).orElse(null);
-        habitacion.setSucursal(sucursal);
-    }
         
-        
-
     if (habitacion.getTipo_habitacion() != null && habitacion.getTipo_habitacion().getId_tipo_habitacion() != null) {
         TipoHabitacion tipo = tipoHabitacionService.buscarId(habitacion.getTipo_habitacion().getId_tipo_habitacion()).orElse(null);
         habitacion.setTipo_habitacion(tipo);
@@ -63,9 +57,14 @@ private TipoHabitacionService tipoHabitacionService;
     @Transactional
     public void eliminar(Integer id) {
         Habitaciones habitacion = repository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Habitación no encontrada"));
-    
-        habitacion.setEstado(0); // 0 representa inactivo/eliminado lógico
+            .orElseThrow(() -> new RuntimeException("Habitación no encontrada"));
+
+            if (habitacionReservaRepository.existsByHabitacion(id)) {
+                throw new RuntimeException("No se puede eliminar: la habitación está asociada a una reserva");
+            }
+            
+
+        habitacion.setEstado(0);
         repository.save(habitacion);
     }
 
