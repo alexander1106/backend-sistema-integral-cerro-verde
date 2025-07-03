@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.TipoTransacciones;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.TransaccionesCaja;
 import com.alexander.sistema_cerro_verde_backend.entity.mantenimiento.Limpiezas;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.CheckinCheckout;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.HabitacionesXReserva;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.SalonesXReserva;
+import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.VentaMetodoPago;
 import com.alexander.sistema_cerro_verde_backend.repository.caja.CajasRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.caja.TransaccionesCajaRepository;
@@ -26,7 +26,6 @@ import com.alexander.sistema_cerro_verde_backend.repository.recepcion.ReservasRe
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.SalonesRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.SalonesReservaRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.ventas.VentasRepository;
-import com.alexander.sistema_cerro_verde_backend.service.administrable.SucursalesService;
 import com.alexander.sistema_cerro_verde_backend.service.recepcion.CheckinCheckoutService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -53,9 +52,6 @@ public class CheckinCheckoutServiceImpl implements CheckinCheckoutService {
     private ReservasRepository reservaRepository;
 
     @Autowired
-    private SucursalesService sucursalService;
-
-    @Autowired
     private VentasRepository repoVenta;
 
     @Autowired
@@ -76,10 +72,6 @@ public class CheckinCheckoutServiceImpl implements CheckinCheckoutService {
     @Override
     @Transactional
     public CheckinCheckout guardar(CheckinCheckout check) {
-        if (check.getSucursal() != null && check.getSucursal().getId() != null) {
-            Sucursales sucursal = sucursalService.buscarId(check.getSucursal().getId()).orElse(null);
-            check.setSucursal(sucursal);
-        }
 
         if (check == null || check.getReserva() == null) {
             throw new IllegalArgumentException("Datos incompletos para guardar el check-in");
@@ -113,7 +105,6 @@ public class CheckinCheckoutServiceImpl implements CheckinCheckoutService {
 
         return repository.findById(check.getId_check())
                 .map(existente -> {
-                    existente.setFecha_checkin(check.getFecha_checkin());
                     existente.setFecha_checkout(check.getFecha_checkout());
 
                     if (check.getFecha_checkout() != null) {

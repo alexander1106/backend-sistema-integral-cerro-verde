@@ -7,10 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Salones;
+import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.SalonesRepository;
-import com.alexander.sistema_cerro_verde_backend.service.administrable.SucursalesService;
+import com.alexander.sistema_cerro_verde_backend.repository.recepcion.SalonesReservaRepository;
 import com.alexander.sistema_cerro_verde_backend.service.recepcion.SalonesService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -22,7 +22,8 @@ public class SalonesServiceImpl implements SalonesService{
     private SalonesRepository repository;
 
     @Autowired
-    private SucursalesService sucursalService;
+    private SalonesReservaRepository salonReservaRepository;
+
 
     @Override
     @Transactional(readOnly = true)
@@ -33,10 +34,6 @@ public class SalonesServiceImpl implements SalonesService{
     @Override
     @Transactional
     public Salones guardar(Salones salon) {
-        if (salon.getSucursal() != null && salon.getSucursal().getId() != null) {
-        Sucursales sucursal = sucursalService.buscarId(salon.getSucursal().getId()).orElse(null);
-        salon.setSucursal(sucursal);
-    }
 
         return repository.save(salon);
     }
@@ -78,9 +75,16 @@ public class SalonesServiceImpl implements SalonesService{
     @Transactional
     public void eliminar(Integer id) {
         Salones salon = repository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Salón no encontrado"));
-    
-        salon.setEstado(0); 
+            .orElseThrow(() -> new RuntimeException("Habitación no encontrada"));
+
+            if (salonReservaRepository.existsBySalon(id)) {
+                throw new RuntimeException("No se puede eliminar: la habitación está asociada a una reserva");
+            }
+            
+
+        salon.setEstado(0);
         repository.save(salon);
     }
+
 }
+

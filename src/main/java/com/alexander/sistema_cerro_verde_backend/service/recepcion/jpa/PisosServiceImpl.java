@@ -9,11 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Pisos;
+import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.HabitacionesRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.PisosRepository;
-import com.alexander.sistema_cerro_verde_backend.service.administrable.SucursalesService;
 import com.alexander.sistema_cerro_verde_backend.service.recepcion.PisosService;
 
 
@@ -26,9 +25,6 @@ public class PisosServiceImpl implements PisosService {
     @Autowired
     private HabitacionesRepository habitacionesRepository;
 
-    @Autowired
-    private SucursalesService sucursalService;
-
     @Override
     @Transactional(readOnly = true)
     public List<Pisos> buscarTodos() {
@@ -38,10 +34,6 @@ public class PisosServiceImpl implements PisosService {
     @Override
     @Transactional
     public Pisos guardar(Pisos piso) {
-        if (piso.getSucursal() != null && piso.getSucursal().getId() != null) {
-        Sucursales sucursal = sucursalService.buscarId(piso.getSucursal().getId()).orElse(null);
-        piso.setSucursal(sucursal);
-    }
 
         return repository.save(piso);
     }

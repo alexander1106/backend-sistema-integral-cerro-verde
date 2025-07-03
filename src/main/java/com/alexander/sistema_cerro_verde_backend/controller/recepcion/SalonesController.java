@@ -23,7 +23,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 @CrossOrigin("*") 
 @RestController
-@RequestMapping("/cerro-verde/recepcion")
+@RequestMapping("/hoteleria/recepcion")
 public class SalonesController {
 
     @Autowired
@@ -66,10 +66,9 @@ public class SalonesController {
     }
 
     @DeleteMapping("/salones/eliminar/{id}")
-    public String eliminar(@PathVariable Integer id){
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id){
         salonesService.eliminar(id);
-        return "Salón eliminado";
+        return ResponseEntity.noContent().build(); // HTTP 204
     }
-
     
 }
