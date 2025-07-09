@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Conductores;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Recojo;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Reservas;
-import com.alexander.sistema_cerro_verde_backend.entity.Sucursales;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.RecojoRepository;
 import com.alexander.sistema_cerro_verde_backend.service.recepcion.ConductoresService;
 import com.alexander.sistema_cerro_verde_backend.service.recepcion.RecojoService;

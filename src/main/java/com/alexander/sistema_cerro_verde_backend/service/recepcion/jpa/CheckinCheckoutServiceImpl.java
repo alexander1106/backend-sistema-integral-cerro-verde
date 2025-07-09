@@ -5,21 +5,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alexander.sistema_cerro_verde_backend.entity.caja.TipoTransacciones;
-import com.alexander.sistema_cerro_verde_backend.entity.caja.TransaccionesCaja;
 import com.alexander.sistema_cerro_verde_backend.entity.mantenimiento.Limpiezas;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.CheckinCheckout;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.HabitacionesXReserva;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.SalonesXReserva;
-import com.alexander.sistema_cerro_verde_backend.entity.seguridad.Usuarios;
-import com.alexander.sistema_cerro_verde_backend.entity.ventas.VentaMetodoPago;
-import com.alexander.sistema_cerro_verde_backend.repository.caja.CajasRepository;
-import com.alexander.sistema_cerro_verde_backend.repository.caja.TransaccionesCajaRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.mantenimiento.LimpiezasRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.CheckinCheckoutRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.HabitacionesRepository;
@@ -27,8 +19,6 @@ import com.alexander.sistema_cerro_verde_backend.repository.recepcion.Habitacion
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.ReservasRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.SalonesRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.SalonesReservaRepository;
-import com.alexander.sistema_cerro_verde_backend.repository.seguridad.UsuariosRepository;
-import com.alexander.sistema_cerro_verde_backend.repository.ventas.VentasRepository;
 import com.alexander.sistema_cerro_verde_backend.service.recepcion.CheckinCheckoutService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -54,26 +44,10 @@ public class CheckinCheckoutServiceImpl implements CheckinCheckoutService {
     @Autowired
     private ReservasRepository reservaRepository;
 
-    @Autowired
-    private VentasRepository repoVenta;
-
-    @Autowired
-    private CajasRepository repoCaja;
-
-    @Autowired
-    private TransaccionesCajaRepository repoTransacciones;
+ 
 
     @Autowired
     private LimpiezasRepository repoLimpiezas;
-
-    @Autowired
-    private UsuariosRepository usuarioRepository;
-
-    private Usuarios getUsuarioAutenticado() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        return usuarioRepository.findByUsername(username);
-    }
 
     @Override
     @Transactional(readOnly = true)
@@ -90,11 +64,7 @@ public class CheckinCheckoutServiceImpl implements CheckinCheckoutService {
         }
 
         var reserva = reservaRepository.findById(check.getReserva().getId_reserva())
-                .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada"));
-
-        if (!"pagada".equalsIgnoreCase(reserva.getEstado_reserva())) {
-            throw new IllegalArgumentException("No se puede hacer check-in: la reserva no está pagada");
-        }
+        .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada"));
 
         reserva.setEstado_reserva("Check-in");
         check.setReserva(reserva);
@@ -122,56 +92,6 @@ public class CheckinCheckoutServiceImpl implements CheckinCheckoutService {
                     if (check.getFecha_checkout() != null) {
                         var reserva = existente.getReserva();
                         reserva.setEstado_reserva("Completada");
-
-                        // 1. Obtener venta y marcar como completada
-                        var venta = reserva.getVentaXReserva().get(0).getVenta();
-                        venta.setEstadoVenta("Completado");
-                        repoVenta.save(venta);
-
-                        // 2. Obtener caja abierta
-                        var usuario = getUsuarioAutenticado();
-                        var caja = repoCaja.findByUsuarioAndEstadoCaja(usuario, "abierta")
-                                .orElseThrow(() -> new RuntimeException("No hay caja abierta"));
-
-                        // 3. Obtener tipo de transacción ingreso
-                        TipoTransacciones tipoIngreso = new TipoTransacciones();
-                        tipoIngreso.setId(1); // 1 = ingreso
-
-                        // 4. Por cada método de pago, registrar la diferencia como nueva transacción
-                        for (VentaMetodoPago metodo : venta.getVentaMetodoPago()) {
-                            double pagoActual = metodo.getPago();
-                            int idMetodo = metodo.getMetodoPago().getIdMetodoPago();
-
-                            List<TransaccionesCaja> transaccionesPrevias = repoTransacciones
-                                    .findByVentaIdAndMetodoPagoIdAndTipoId(venta.getIdVenta(), 1, idMetodo);
-
-                            double yaRegistrado = transaccionesPrevias.stream()
-                                    .mapToDouble(TransaccionesCaja::getMontoTransaccion)
-                                    .sum();
-
-                            double diferencia = pagoActual - yaRegistrado;
-
-                            if (diferencia > 0) {
-                                TransaccionesCaja nueva = new TransaccionesCaja();
-                                nueva.setMontoTransaccion(diferencia);
-                                nueva.setFechaHoraTransaccion(new Date());
-                                nueva.setCaja(caja);
-                                nueva.setTipo(tipoIngreso);
-                                nueva.setVenta(venta);
-                                nueva.setMetodoPago(metodo.getMetodoPago());
-
-                                repoTransacciones.save(nueva);
-
-                                // Actualizar saldos en caja
-                                caja.setSaldoTotal(caja.getSaldoTotal() + diferencia);
-
-                                if ("Efectivo".equalsIgnoreCase(metodo.getMetodoPago().getNombre())) {
-                                    caja.setSaldoFisico(caja.getSaldoFisico() + diferencia);
-                                }
-
-                                repoCaja.save(caja);
-                            }
-                        }
 
                         // 5. Cambiar estado de habitaciones
                         List<HabitacionesXReserva> habitaciones = habitacionesReservasRepository.findByReservaId(reserva.getId_reserva());
