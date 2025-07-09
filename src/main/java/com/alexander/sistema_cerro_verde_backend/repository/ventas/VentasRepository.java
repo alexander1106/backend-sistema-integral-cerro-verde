@@ -17,8 +17,8 @@ import com.alexander.sistema_cerro_verde_backend.entity.reportes.SalonVentasDeta
 import com.alexander.sistema_cerro_verde_backend.entity.reportes.VentaResumenDTO;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.Ventas;
 
-public interface VentasRepository extends JpaRepository<Ventas, Integer>{  
-    
+public interface VentasRepository extends JpaRepository<Ventas, Integer> {
+
     // 1) Productos Más Vendidos
     @Query(value = """
         SELECT
@@ -36,8 +36,8 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
         ORDER BY cantidadVendida DESC
         """, nativeQuery = true)
     List<ProductoVentasDTO> findProductosMasVendidos(
-        @Param("desde") String desde,
-        @Param("hasta") String hasta
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
     );
 
     // 2) Clientes Más Frecuentes
@@ -56,8 +56,8 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
         ORDER BY cantidadCompras DESC
         """, nativeQuery = true)
     List<ClienteFrecuenteDTO> findClientesFrecuentes(
-        @Param("desde") String desde,
-        @Param("hasta") String hasta
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
     );
 
     // 3) Habitaciones Más Vendidas
@@ -78,8 +78,8 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
         ORDER BY vecesVendida DESC
         """, nativeQuery = true)
     List<HabitacionVentasDTO> findHabitacionesMasVendidas(
-        @Param("desde") String desde,
-        @Param("hasta") String hasta
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
     );
 
     // 4) Salones Más Vendidos/Alquilados
@@ -99,8 +99,8 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
         ORDER BY vecesAlquilado DESC
         """, nativeQuery = true)
     List<SalonVentasDTO> findSalonesMasVendidos(
-        @Param("desde") String desde,
-        @Param("hasta") String hasta
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
     );
 
     // 5) Métodos de Pago Más Usados
@@ -120,8 +120,8 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
         ORDER BY totalRecibido DESC
         """, nativeQuery = true)
     List<PagoVentasDTO> findMetodosPago(
-        @Param("desde") String desde,
-        @Param("hasta") String hasta
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
     );
 
     // —— DTO detallado con lista de productos ——
@@ -147,8 +147,8 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
         ORDER BY vecesAlquilado DESC
         """, nativeQuery = true)
     List<SalonVentasDetalladoDTO> findSalonesDetallado(
-        @Param("desde") String desde,
-        @Param("hasta") String hasta
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
     );
 
     // 7) Habitaciones Detallado
@@ -173,8 +173,8 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
         ORDER BY vecesVendida DESC
         """, nativeQuery = true)
     List<HabitacionVentasDetalladoDTO> findHabitacionesDetallado(
-        @Param("desde") String desde,
-        @Param("hasta") String hasta
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
     );
 
     // 8) Métodos de Pago Detallado
@@ -203,10 +203,9 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
         ORDER BY totalRecibido DESC
         """, nativeQuery = true)
     List<PagoVentasDetalladoDTO> findMetodosPagoDetallado(
-        @Param("desde") String desde,
-        @Param("hasta") String hasta
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
     );
-
 
     // —— VERSIÓN “Resumen Genérico” para PDF/Excel ——
     @Query(value = """
@@ -225,8 +224,8 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
     ORDER BY cantidad DESC
     """, nativeQuery = true)
     List<VentaResumenDTO> findProductosMasVendidosResumen(
-        @Param("desde") String desde,
-        @Param("hasta") String hasta
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
     );
 
     @Query(value = """
@@ -245,8 +244,8 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
     ORDER BY cantidad DESC
     """, nativeQuery = true)
     List<VentaResumenDTO> findSalonesMasVendidosResumen(
-        @Param("desde") String desde,
-        @Param("hasta") String hasta
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
     );
 
     @Query(value = """
@@ -266,8 +265,8 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
         ORDER BY cantidad DESC
         """, nativeQuery = true)
     List<VentaResumenDTO> findHabitacionesMasVendidasResumen(
-        @Param("desde") String desde,
-        @Param("hasta") String hasta
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
     );
 
     @Query(value = """
@@ -285,8 +284,8 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
         ORDER BY cantidad DESC
         """, nativeQuery = true)
     List<VentaResumenDTO> findClientesFrecuentesResumen(
-        @Param("desde") String desde,
-        @Param("hasta") String hasta
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
     );
 
     @Query(value = """
@@ -305,10 +304,9 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
         ORDER BY cantidad DESC
         """, nativeQuery = true)
     List<VentaResumenDTO> findMetodosPagoResumen(
-        @Param("desde") String desde,
-        @Param("hasta") String hasta
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
     );
-
 
     // Para habitaciones por mes
     @Query(value = """
@@ -323,13 +321,13 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
     GROUP BY MONTH(STR_TO_DATE(v.fecha, '%Y-%m-%d'))
     ORDER BY MONTH(STR_TO_DATE(v.fecha, '%Y-%m-%d'))
     """, nativeQuery = true)
-  List<Object[]> findRawReservasHabitacionesPorMes(
-      @Param("desde") String desde,
-      @Param("hasta") String hasta
-  );
+    List<Object[]> findRawReservasHabitacionesPorMes(
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
+    );
 
-  // Para salones por mes
-  @Query(value = """
+    // Para salones por mes
+    @Query(value = """
     SELECT
       MONTHNAME(STR_TO_DATE(v.fecha, '%Y-%m-%d')) AS mes,
       COUNT(*)                                  AS cantidad,
@@ -341,9 +339,11 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer>{
     GROUP BY MONTH(STR_TO_DATE(v.fecha, '%Y-%m-%d'))
     ORDER BY MONTH(STR_TO_DATE(v.fecha, '%Y-%m-%d'))
     """, nativeQuery = true)
-  List<Object[]> findRawReservasSalonesPorMes(
-      @Param("desde") String desde,
-      @Param("hasta") String hasta
-  );
+    List<Object[]> findRawReservasSalonesPorMes(
+            @Param("desde") String desde,
+            @Param("hasta") String hasta
+    );
 
+    @Query("SELECT v FROM Ventas v JOIN v.ventaXReserva vr WHERE v.tipoVenta = 'productos' AND v.estadoVenta = 'pendiente' AND vr.reserva.id = :reservaId")
+    List<Ventas> findVentasProductosPendientesByReserva(@Param("reservaId") Integer reservaId);
 }

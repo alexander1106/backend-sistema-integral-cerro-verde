@@ -39,6 +39,7 @@ public class Ventas {
     private Double igv;
     private Integer estado = 1;
     private String estadoVenta;
+    private String tipoVenta;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_sucursal")
@@ -243,5 +244,13 @@ public class Ventas {
 
     public void setTransaccionCaja(List<TransaccionesCaja> transaccionCaja) {
         this.transaccionCaja = transaccionCaja;
+    }
+
+    public String getTipoVenta() {
+        return tipoVenta;
+    }
+
+    public void setTipoVenta(String tipoVenta) {
+        this.tipoVenta = tipoVenta;
     }
 }

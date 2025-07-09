@@ -1,12 +1,14 @@
 package com.alexander.sistema_cerro_verde_backend.repository.caja;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.alexander.sistema_cerro_verde_backend.entity.caja.Cajas;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.TransaccionesCaja;
-import java.util.List;
+import com.alexander.sistema_cerro_verde_backend.entity.ventas.Ventas;
 
 public interface TransaccionesCajaRepository extends JpaRepository<TransaccionesCaja, Integer> {
 
@@ -21,5 +23,7 @@ public interface TransaccionesCajaRepository extends JpaRepository<Transacciones
             @Param("tipoId") Integer tipoId,
             @Param("idMetodoPago") Integer idMetodoPago
     );
+
+    List<TransaccionesCaja> findByVenta(Ventas venta);
 
 }
