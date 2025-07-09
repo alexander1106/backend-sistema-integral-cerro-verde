@@ -16,19 +16,21 @@ public class ApiCliente {
             .build();
     }
 
-    public String consumirApi(String dni) {
+    public String consumirApi(String numero) {
+        String tipo = numero.length() == 8 ? "reniec/dni" : "sunat/ruc";
+    
         Mono<String> respuesta = web.get()
             .uri(uriBuilder -> uriBuilder
-                .path("/reniec/dni")
-                .queryParam("numero", dni)
+                .path("/" + tipo)
+                .queryParam("numero", numero)
                 .build()
             )
-            .header("Authorization", "Bearer " + TOKEN) // Agrega el token en header
+            .header("Authorization", "Bearer " + TOKEN)
             .retrieve()
             .bodyToMono(String.class);
-
-        return respuesta.block(); // bloquea hasta que obtenga respuesta
+    
+        return respuesta.block();
     }
-
+    
     
 }
