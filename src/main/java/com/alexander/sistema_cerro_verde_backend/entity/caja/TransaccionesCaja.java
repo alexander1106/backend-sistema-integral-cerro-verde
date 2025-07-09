@@ -25,6 +25,7 @@ public class TransaccionesCaja {
     private Integer id;
     private Double montoTransaccion;
     private Date fechaHoraTransaccion;
+    private String motivo;
 
     @ManyToOne
     @JoinColumn(name = "id_caja")
@@ -93,13 +94,6 @@ public class TransaccionesCaja {
         this.estado = estado;
     }
 
-    @Override
-    public String toString() {
-        return "TransaccionesCaja [id=" + id + ", montoTransaccion=" + montoTransaccion + ", fechaHoraTransaccion="
-                + fechaHoraTransaccion + ", caja=" + caja + ", tipo=" + tipo + ", estado="
-                + estado + "]";
-    }
-
     public Ventas getVenta() {
         return venta;
     }
@@ -116,7 +110,18 @@ public class TransaccionesCaja {
         this.metodoPago = metodoPago;
     }
 
+    public String getMotivo() {
+        return motivo;
+    }
 
+    public void setMotivo(String motivo) {
+        this.motivo = motivo;
+    }
 
-    
+    @Override
+    public String toString() {
+        return "TransaccionesCaja [id=" + id + ", montoTransaccion=" + montoTransaccion + ", fechaHoraTransaccion="
+                + fechaHoraTransaccion + ", motivo=" + motivo + ", caja=" + caja + ", tipo=" + tipo + ", venta=" + venta
+                + ", metodoPago=" + metodoPago + ", estado=" + estado + "]";
+    }
 }
