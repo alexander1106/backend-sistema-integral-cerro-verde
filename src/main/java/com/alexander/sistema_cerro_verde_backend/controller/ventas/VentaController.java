@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.Ventas;
@@ -42,16 +43,77 @@ public class VentaController {
         return ventaService.buscarPorId(id);
     }
 
-    @PostMapping("/venta")
-    public Ventas guardar(@RequestBody Ventas venta) {
-        ventaService.guardar(venta);
-        return venta;
+    // Endpoint para registrar pago de hospedaje
+    @PostMapping("/venta/hospedaje")
+    public ResponseEntity<Map<String, Object>> registrarPagoHospedaje(@RequestBody Ventas venta) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            ventaService.registrarPagoHospedaje(venta);
+            response.put("success", true);
+            response.put("mensaje", "Pago de hospedaje registrado exitosamente");
+            response.put("ventaId", venta.getIdVenta());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
-    @PutMapping("/venta")
-    public Ventas modificar(@RequestBody Ventas venta) {
-        ventaService.modificar(venta);
-        return venta;
+    // Endpoint para registrar venta de productos
+    @PostMapping("/venta/productos")
+    public ResponseEntity<Map<String, Object>> registrarVentaProductos(@RequestBody Ventas venta) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            ventaService.registrarVentaProductos(venta);
+            response.put("success", true);
+            response.put("mensaje", "Venta de productos registrada exitosamente");
+            response.put("ventaId", venta.getIdVenta());
+            response.put("estado", "pendiente");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    // Endpoint para editar venta de productos (solo pendientes)
+    @PutMapping("/venta/productos")
+    public ResponseEntity<Map<String, Object>> editarVentaProductos(@RequestBody Ventas venta) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            ventaService.editarVentaProductos(venta);
+            response.put("success", true);
+            response.put("mensaje", "Venta de productos editada exitosamente");
+            response.put("ventaId", venta.getIdVenta());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    // Endpoint para confirmar venta de productos (generar comprobante)
+    @PutMapping("/venta/productos/{id}/confirmar")
+    public ResponseEntity<Map<String, Object>> confirmarVentaProductos(
+            @PathVariable Integer id,
+            @RequestParam String tipoComprobante) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            ventaService.confirmarVentaProductos(id, tipoComprobante);
+            response.put("success", true);
+            response.put("mensaje", "Venta confirmada y comprobante generado exitosamente");
+            response.put("ventaId", id);
+            response.put("estado", "completada");
+            response.put("tipoComprobante", tipoComprobante);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @DeleteMapping("/venta/{id}")

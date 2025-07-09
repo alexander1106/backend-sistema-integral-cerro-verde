@@ -1,5 +1,6 @@
 package com.alexander.sistema_cerro_verde_backend.service.recepcion.jpa;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -7,13 +8,20 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.alexander.sistema_cerro_verde_backend.entity.caja.Cajas;
+import com.alexander.sistema_cerro_verde_backend.entity.caja.TipoTransacciones;
+import com.alexander.sistema_cerro_verde_backend.entity.caja.TransaccionesCaja;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Habitaciones;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.HabitacionesXReserva;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Reservas;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.Salones;
 import com.alexander.sistema_cerro_verde_backend.entity.recepcion.SalonesXReserva;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.Clientes;
+import com.alexander.sistema_cerro_verde_backend.entity.ventas.VentaMetodoPago;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.Ventas;
+import com.alexander.sistema_cerro_verde_backend.repository.caja.CajasRepository;
+import com.alexander.sistema_cerro_verde_backend.repository.caja.TransaccionesCajaRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.HabitacionesRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.HabitacionesReservaRepository;
 import com.alexander.sistema_cerro_verde_backend.repository.recepcion.ReservasRepository;
@@ -56,6 +64,12 @@ public class ReservaServiceImpl implements ReservasService {
 
     @Autowired
     private VentasRepository repoVenta;
+
+    @Autowired
+    private TransaccionesCajaRepository repoTransacciones;
+
+    @Autowired
+    private CajasRepository repoCaja;
 
     @Override
     @Transactional(readOnly = true)
@@ -192,47 +206,85 @@ public class ReservaServiceImpl implements ReservasService {
     }
 
     @Override
-@Transactional
-public void cancelar(Integer idReserva) {
-    Reservas reserva = repository.findById(idReserva)
-            .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+    @Transactional
+    public void cancelar(Integer idReserva) {
+        Reservas reserva = repository.findById(idReserva)
+                .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
 
-    if (!"Pagada".equalsIgnoreCase(reserva.getEstado_reserva())) {
-        throw new RuntimeException("Solo se puede cancelar una reserva ya pagada");
+        if (!"Pagada".equalsIgnoreCase(reserva.getEstado_reserva())) {
+            throw new RuntimeException("Solo se puede cancelar una reserva ya pagada");
+        }
+
+        reserva.setEstado_reserva("Cancelada");
+        repository.save(reserva);
+
+        // Liberar habitaciones
+        List<HabitacionesXReserva> habitaciones = habitacionesReservaRepository.findByReservaId(idReserva);
+        for (HabitacionesXReserva hr : habitaciones) {
+            Habitaciones habitacion = hr.getHabitacion();
+            habitacion.setEstado_habitacion("Disponible");
+            habitacionesRepository.save(habitacion);
+        }
+
+        // Liberar salones
+        List<SalonesXReserva> salones = salonesReservaRepository.findByReservaId(idReserva);
+        for (SalonesXReserva sr : salones) {
+            Salones salon = sr.getSalon();
+            salon.setEstado_salon("Disponible");
+            salonesRepository.save(salon);
+        }
+
+        // Eliminar relaciones
+        habitacionesReservaRepository.deleteByReservaId(idReserva);
+        salonesReservaRepository.deleteByReservaId(idReserva);
+
+        // Obtener venta asociada
+        Ventas venta = reserva.getVentaXReserva().get(0).getVenta();
+
+        // Obtener la caja desde la transacción original (asumimos que al menos una existe)
+        List<TransaccionesCaja> transacciones = repoTransacciones.findByVenta(venta);
+        if (!transacciones.isEmpty()) {
+            Cajas caja = transacciones.get(0).getCaja(); // Usamos la caja original
+
+            // Recorrer métodos de pago de la venta
+            if (venta.getVentaMetodoPago() != null && !venta.getVentaMetodoPago().isEmpty()) {
+                for (VentaMetodoPago m : venta.getVentaMetodoPago()) {
+                    double monto = m.getPago();
+                    if (monto > 0) {
+                        var metodoPago = m.getMetodoPago();
+
+                        // Siempre restar del saldo total
+                        caja.setSaldoTotal(caja.getSaldoTotal() - monto);
+
+                        // Si es efectivo, restar saldo físico y registrar egreso
+                        if ("Efectivo".equalsIgnoreCase(metodoPago.getNombre())) {
+                            caja.setSaldoFisico(caja.getSaldoFisico() - monto);
+
+                            TransaccionesCaja egreso = new TransaccionesCaja();
+                            egreso.setMontoTransaccion(monto);
+                            egreso.setFechaHoraTransaccion(new Date());
+                            egreso.setCaja(caja);
+                            egreso.setVenta(venta);
+                            egreso.setMetodoPago(metodoPago);
+
+                            TipoTransacciones tipoEgreso = new TipoTransacciones();
+                            tipoEgreso.setId(2); // 2 = egreso
+                            egreso.setTipo(tipoEgreso);
+
+                            repoTransacciones.save(egreso);
+                        }
+                    }
+                }
+                repoCaja.save(caja); // guardar los cambios en la caja
+            }
+        }
+
+        // Emitir nota de crédito (con el total de la venta y motivo)
+        notaCreditoService.emitirNotaCredito(venta, venta.getTotal(), "Cancelación de reserva");
+
+        // Cambiar estado de la venta
+        venta.setEstadoVenta("Cancelado");
+        repoVenta.save(venta);
     }
-
-    reserva.setEstado_reserva("Cancelada");
-    repository.save(reserva);
-
-    // Liberar habitaciones
-    List<HabitacionesXReserva> habitaciones = habitacionesReservaRepository.findByReservaId(idReserva);
-    for (HabitacionesXReserva hr : habitaciones) {
-        Habitaciones habitacion = hr.getHabitacion();
-        habitacion.setEstado_habitacion("Disponible");
-        habitacionesRepository.save(habitacion);
-    }
-
-    // Liberar salones
-    List<SalonesXReserva> salones = salonesReservaRepository.findByReservaId(idReserva);
-    for (SalonesXReserva sr : salones) {
-        Salones salon = sr.getSalon();
-        salon.setEstado_salon("Disponible");
-        salonesRepository.save(salon);
-    }
-
-    // Eliminar relaciones
-    habitacionesReservaRepository.deleteByReservaId(idReserva);
-    salonesReservaRepository.deleteByReservaId(idReserva);
-
-    // Obtener venta asociada
-    Ventas venta = reserva.getVentaXReserva().get(0).getVenta();
-
-    // Emitir nota de crédito (con el total de la venta y motivo)
-    notaCreditoService.emitirNotaCredito(venta, venta.getTotal(), "Cancelación de reserva");
-
-    // Cambiar estado de la venta
-    venta.setEstadoVenta("Cancelado");
-    repoVenta.save(venta);
-}
 
 }

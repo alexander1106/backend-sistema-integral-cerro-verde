@@ -14,9 +14,13 @@ public interface IVentaService {
 
     VentaDTO convertirDTO(Ventas venta);
 
-    void guardar (Ventas venta); //Guardar venta
+    void registrarPagoHospedaje (Ventas venta); //Guardar venta de hospedaje
 
-    void modificar (Ventas venta); //Modificar venta
+    void registrarVentaProductos (Ventas venta); //Guardar venta de productos
+
+    void editarVentaProductos(Ventas venta); //Editar venta de productos
+
+    void confirmarVentaProductos (Integer id, String tipoComprobante); //Confirmar venta de productos
 
     void eliminar (Integer id); //Eliminar venta
 
