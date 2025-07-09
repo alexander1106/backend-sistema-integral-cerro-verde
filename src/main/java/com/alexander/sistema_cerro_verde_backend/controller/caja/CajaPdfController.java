@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alexander.sistema_cerro_verde_backend.dto.cajaresumen.ResumenPagosDTO;
 import com.alexander.sistema_cerro_verde_backend.dto.cajaresumen.VentaCajaDTO;
 import com.alexander.sistema_cerro_verde_backend.service.caja.resumen.CajaPdfService;
 
@@ -34,4 +35,10 @@ public class CajaPdfController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }
+
+    @GetMapping("/resumen-ventas-tipo-pago")
+    public ResponseEntity<ResumenPagosDTO> resumenPorTipoPago(@RequestParam Integer idCaja) {
+        return ResponseEntity.ok(cajaPdfService.resumenPorTipoDePago(idCaja));
+    }
+
 }

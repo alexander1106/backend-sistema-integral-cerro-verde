@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alexander.sistema_cerro_verde_backend.dto.cajaresumen.ResumenPagosDTO;
 import com.alexander.sistema_cerro_verde_backend.dto.cajaresumen.VentaCajaDTO;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.Cajas;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.VentaMetodoPago;
@@ -120,6 +121,46 @@ public class CajaPdfService {
 
         return baos.toByteArray();
     }
+
+    public ResumenPagosDTO resumenPorTipoDePago(Integer idCaja) {
+        Cajas caja = cajasRepository.findById(idCaja)
+            .orElseThrow(() -> new RuntimeException("Caja no encontrada"));
+    
+        LocalDate fechaApertura = caja.getFechaApertura()
+            .toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    
+        List<Ventas> ventas = ventasRepository.findAll().stream()
+            .filter(v -> {
+                try {
+                    if (v.getFecha() == null) return false;
+                    LocalDate fechaVenta = LocalDate.parse(v.getFecha(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    return !fechaVenta.isBefore(fechaApertura);
+                } catch (Exception e) {
+                    return false;
+                }
+            }).collect(Collectors.toList());
+    
+        ResumenPagosDTO resumen = new ResumenPagosDTO();
+    
+        for (Ventas venta : ventas) {
+            if (venta.getVentaMetodoPago() == null) continue;
+    
+            for (VentaMetodoPago vmp : venta.getVentaMetodoPago()) {
+                if (vmp.getMetodoPago() == null) continue;
+    
+                String metodo = vmp.getMetodoPago().getNombre().toLowerCase().trim();
+                double pago = vmp.getPago();
+    
+                if (metodo.contains("efectivo")) resumen.setEfectivo(resumen.getEfectivo() + pago);
+                else if (metodo.contains("yape")) resumen.setYape(resumen.getYape() + pago);
+                else if (metodo.contains("plin")) resumen.setPlin(resumen.getPlin() + pago);
+                else if (metodo.contains("tarjeta")) resumen.setTarjeta(resumen.getTarjeta() + pago);
+            }
+        }
+    
+        return resumen;
+    }
+    
 
     private List<VentaCajaDTO> mapearVentas(List<Ventas> ventas) {
         return ventas.stream().map(venta -> {
