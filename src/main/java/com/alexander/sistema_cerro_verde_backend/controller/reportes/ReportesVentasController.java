@@ -289,5 +289,18 @@ public class ReportesVentasController {
         return new ResponseEntity<>(excel, headers, HttpStatus.OK);
         }
 
+        // Cuenta todas las reservas de habitación hechas HOY
+  @GetMapping("/reservas/hoy/habitaciones")
+public ResponseEntity<Long> countHoyHabitaciones() {
+  long total = service.contarReservasHoyHabitaciones();
+  return ResponseEntity.ok(total);
+}
+
+@GetMapping("/reservas/hoy/salones")
+public ResponseEntity<Long> countHoySalones() {
+  long total = service.contarReservasHoySalones();
+  return ResponseEntity.ok(total);
+}
+
 
 }

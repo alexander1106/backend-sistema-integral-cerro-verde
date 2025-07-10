@@ -343,7 +343,28 @@ public interface VentasRepository extends JpaRepository<Ventas, Integer> {
             @Param("desde") String desde,
             @Param("hasta") String hasta
     );
+    
 
     @Query("SELECT v FROM Ventas v JOIN v.ventaXReserva vr WHERE v.tipoVenta = 'productos' AND v.estadoVenta = 'pendiente' AND vr.reserva.id = :reservaId")
     List<Ventas> findVentasProductosPendientesByReserva(@Param("reservaId") Integer reservaId);
+
+    @Query(value = """
+      SELECT COUNT(*)
+      FROM venta_habitacion vh
+      JOIN ventas v ON v.id_venta = vh.id_venta
+      WHERE DATE(v.fecha) = :hoy
+      """, nativeQuery = true)
+    Long countReservasHoyHabitaciones(@Param("hoy") String hoy);
+
+    /**
+     * Cuenta todas las reservas de salón hechas HOY,
+     * comparando únicamente la fecha (sin hora).
+     */
+    @Query(value = """
+      SELECT COUNT(*)
+      FROM venta_salon vs
+      JOIN ventas v ON v.id_venta = vs.id_venta
+      WHERE DATE(v.fecha) = :hoy
+      """, nativeQuery = true)
+    Long countReservasHoySalones(@Param("hoy") String hoy);
 }

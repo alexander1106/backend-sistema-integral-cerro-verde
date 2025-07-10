@@ -2,6 +2,7 @@ package com.alexander.sistema_cerro_verde_backend.service.reportes.jpa;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,6 +58,19 @@ public class ReportesVentasService {
 
     public ReportesVentasService(VentasRepository ventasRepo) {
         this.ventasRepo = ventasRepo;
+    }
+    public long contarReservasHoyHabitaciones() {
+        String hoy = LocalDate.now().toString();  // "2025-07-10"
+        return ventasRepo.countReservasHoyHabitaciones(hoy);
+    }
+
+    /**
+     * Cuenta todas las reservas de salón hechas HOY,
+     * comparando únicamente la fecha (sin hora).
+     */
+    public long contarReservasHoySalones() {
+        String hoy = LocalDate.now().toString();
+        return ventasRepo.countReservasHoySalones(hoy);
     }
 
     /** Carga el logo desde el classpath */

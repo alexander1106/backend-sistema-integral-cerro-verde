@@ -1,6 +1,5 @@
 package com.alexander.sistema_cerro_verde_backend.service.caja.resumen;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -10,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alexander.sistema_cerro_verde_backend.dto.cajaresumen.ResumenPagosDTO;
 import com.alexander.sistema_cerro_verde_backend.dto.cajaresumen.VentaCajaDTO;
 import com.alexander.sistema_cerro_verde_backend.entity.caja.Cajas;
 import com.alexander.sistema_cerro_verde_backend.entity.ventas.VentaMetodoPago;
@@ -34,37 +34,34 @@ public class CajaPdfService {
     @Autowired
     private VentasRepository ventasRepository;
 
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     public List<VentaCajaDTO> obtenerVentasDesdeCaja(Integer idCaja) {
         Cajas caja = cajasRepository.findById(idCaja)
             .orElseThrow(() -> new RuntimeException("Caja no encontrada"));
-    
-        LocalDate fechaApertura = caja.getFechaApertura()
+
+        LocalDateTime fechaApertura = caja.getFechaApertura()
             .toInstant()
             .atZone(ZoneId.systemDefault())
-            .toLocalDate();
-    
+            .toLocalDateTime();
+
+        LocalDateTime fechaCierre = LocalDateTime.now(); // o usa caja.getFechaCierre() si lo tienes
+
         List<Ventas> ventas = ventasRepository.findAll().stream()
             .filter(v -> {
                 try {
                     if (v.getFecha() == null) return false;
-    
-                    LocalDate fechaVenta = LocalDate.parse(v.getFecha(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                    boolean fechaOk = !fechaVenta.isBefore(fechaApertura);
-    
-                    if (!fechaOk) {
-                        System.out.println("⛔ Venta filtrada por fecha: " + v.getFecha());
-                    }
-    
-                    return fechaOk;
+                    LocalDateTime fechaVenta = LocalDateTime.parse(v.getFecha(), FORMATTER);
+                    return !fechaVenta.isBefore(fechaApertura) && !fechaVenta.isAfter(fechaCierre);
                 } catch (Exception e) {
                     System.out.println("❌ Error al parsear fecha de venta: " + v.getFecha());
                     return false;
                 }
             })
             .collect(Collectors.toList());
-    
+
         return mapearVentas(ventas);
-    }    
+    }
 
     public byte[] generarPdfCaja(List<VentaCajaDTO> ventas) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -121,17 +118,58 @@ public class CajaPdfService {
         return baos.toByteArray();
     }
 
+    public ResumenPagosDTO resumenPorTipoDePago(Integer idCaja) {
+        Cajas caja = cajasRepository.findById(idCaja)
+            .orElseThrow(() -> new RuntimeException("Caja no encontrada"));
+
+        LocalDateTime fechaApertura = caja.getFechaApertura()
+            .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        LocalDateTime fechaCierre = LocalDateTime.now();
+
+        List<Ventas> ventas = ventasRepository.findAll().stream()
+            .filter(v -> {
+                try {
+                    if (v.getFecha() == null) return false;
+                    LocalDateTime fechaVenta = LocalDateTime.parse(v.getFecha(), FORMATTER);
+                    return !fechaVenta.isBefore(fechaApertura) && !fechaVenta.isAfter(fechaCierre);
+                } catch (Exception e) {
+                    return false;
+                }
+            }).collect(Collectors.toList());
+
+        ResumenPagosDTO resumen = new ResumenPagosDTO();
+
+        for (Ventas venta : ventas) {
+            if (venta.getVentaMetodoPago() == null) continue;
+
+            for (VentaMetodoPago vmp : venta.getVentaMetodoPago()) {
+                if (vmp.getMetodoPago() == null) continue;
+
+                String metodo = vmp.getMetodoPago().getNombre().toLowerCase().trim();
+                double pago = vmp.getPago();
+
+                if (metodo.contains("efectivo")) resumen.setEfectivo(resumen.getEfectivo() + pago);
+                else if (metodo.contains("yape")) resumen.setYape(resumen.getYape() + pago);
+                else if (metodo.contains("plin")) resumen.setPlin(resumen.getPlin() + pago);
+                else if (metodo.contains("tarjeta")) resumen.setTarjeta(resumen.getTarjeta() + pago);
+            }
+        }
+
+        return resumen;
+    }
+
     private List<VentaCajaDTO> mapearVentas(List<Ventas> ventas) {
         return ventas.stream().map(venta -> {
             VentaCajaDTO dto = new VentaCajaDTO();
             if (venta.getComprobantePago() != null) {
                 String num = venta.getComprobantePago().getNumComprobante();
                 String serie = venta.getComprobantePago().getNumSerieBoleta();
-            
+
                 if (serie == null || serie.isEmpty()) {
                     serie = venta.getComprobantePago().getNumSerieFactura();
                 }
-            
+
                 if (serie == null || serie.isEmpty()) {
                     dto.setCodigoBoleta(num); // fallback
                 } else {
@@ -140,9 +178,9 @@ public class CajaPdfService {
             } else {
                 dto.setCodigoBoleta("SIN COMPROBANTE");
             }
-            
+
             dto.setTotal(venta.getTotal());
-    
+
             if (venta.getVentaMetodoPago() != null) {
                 for (VentaMetodoPago vmp : venta.getVentaMetodoPago()) {
                     if (vmp.getMetodoPago() == null) continue;
@@ -155,9 +193,9 @@ public class CajaPdfService {
                     }
                 }
             }
-    
+
             return dto;
         }).collect(Collectors.toList());
     }
-    
+
 }
